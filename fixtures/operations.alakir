@@ -1,0 +1,3 @@
+declare x = 12;
+
+const calculation = x + 2 - 14

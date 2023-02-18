@@ -1,0 +1,8 @@
+const x = 12;
+declare y;
+
+if (x > 10) {
+    y = "Greater";
+} else {
+    y = "Smaller";
+}

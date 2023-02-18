@@ -1,0 +1,6 @@
+declare num = 123.34;
+const str = "String";
+
+num = 123.67;
+
+print num;
