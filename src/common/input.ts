@@ -11,7 +11,3 @@ export function createInput<T = string>(input: T, index = 0): Input<T> {
     index,
   };
 }
-
-export function createStringInput<T>(input: string) {
-  return createInput<T>([...input] as unknown as T);
-}
