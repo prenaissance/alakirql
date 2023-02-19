@@ -29,6 +29,7 @@ const getFirstMatch =
   };
 
 const getLookaheadToken = getFirstMatch(
+  getSymbol,
   getKeyword,
   getBoolean,
   getDateLiteral,
@@ -43,10 +44,6 @@ function getNextToken(input: Input): Readonly<[Input, Token]> {
   if (isIgnore(char)) {
     return getNextToken(createInput(input.input, input.index + 1));
   }
-  if (isSymbol(char)) {
-    return getSymbol(input);
-  }
-
   const lookaheadToken = getLookaheadToken(input);
   if (lookaheadToken) {
     return lookaheadToken;

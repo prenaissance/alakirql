@@ -93,7 +93,11 @@ export const getBoolean = (input: Input) => {
 export const getSymbol = (input: Input) => {
   const char = input.input[input.index];
   const lookaheadSymbol = input.input.slice(input.index, input.index + 2);
+  const isCharMatch = symbolMap.has(char);
   const isLookaheadMatch = symbolMap.has(lookaheadSymbol);
+  if (!isCharMatch && !isLookaheadMatch) {
+    return null;
+  }
 
   return [
     createInput(

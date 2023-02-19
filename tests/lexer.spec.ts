@@ -137,20 +137,20 @@ describe("lexer", () => {
         type: TokenType.Boolean,
         value: false,
         meta: {
-          index: 7,
+          index: 8,
         },
       },
       {
         type: TokenType.Or,
         meta: {
-          index: 13,
+          index: 14,
         },
       },
       {
         type: TokenType.Boolean,
         value: true,
         meta: {
-          index: 15,
+          index: 17,
         },
       },
     ];
@@ -178,33 +178,33 @@ describe("lexer", () => {
         type: TokenType.Number,
         value: 2,
         meta: {
-          index: 4,
+          index: 5,
         },
       },
       {
         type: TokenType.And,
         meta: {
-          index: 6,
+          index: 7,
         },
       },
       {
         type: TokenType.Number,
         value: 3,
         meta: {
-          index: 8,
+          index: 10,
         },
       },
       {
         type: TokenType.LessThan,
         meta: {
-          index: 10,
+          index: 12,
         },
       },
       {
         type: TokenType.Number,
         value: 4,
         meta: {
-          index: 12,
+          index: 14,
         },
       },
     ];
