@@ -9,12 +9,10 @@ import {
   getNumberLiteral,
   getStringLiteral,
   getSymbol,
-  symbolMap,
 } from "./mappings";
 import { LexingError } from "./errors";
 
 const isIgnore = (char: string) => char !== "\n" && char.match(/\s+/);
-const isSymbol = (char: string) => symbolMap.has(char);
 
 const getFirstMatch =
   (...fns: ((input: Input) => Readonly<[Input, Token]> | null)[]) =>

@@ -1,7 +1,7 @@
 import { expect, describe, it } from "vitest";
 
 import lex from "../src/lexer";
-import { TokenNode, TokenValueNode, TokenType } from "../src/lexer/tokens";
+import { TokenType } from "../src/lexer/tokens";
 import { LexingError } from "../src/lexer/errors";
 
 describe("lexer", () => {

@@ -1,5 +1,4 @@
 import { Input, createInput } from "@/common/input";
-import { LexingError } from "./errors";
 import { Token, TokenType } from "./tokens";
 
 export const keywordMap = new Map<string, TokenType>([
