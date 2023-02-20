@@ -18,8 +18,9 @@ plugins:
   - prettier
 rules:
   eqeqeq: error
-  "import/no-unresolved": "error"
-  "@typescript-eslint/no-non-null-assertion": "off"
+  "import/no-unresolved": error
+  "@typescript-eslint/no-non-null-assertion": off
+  "@typescript-eslint/ban-ts-comment": off
 settings:
   "import/parsers": 
     "@typescript-eslint/parser": [".ts", ".tsx"]
