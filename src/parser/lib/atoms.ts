@@ -1,8 +1,8 @@
-import { Token, TokenType } from "@/lexer/tokens";
+import { Token, TokenNode, TokenType, TokenValueNode } from "@/lexer/tokens";
 import { Parser } from "./parser";
 
 export const token = (token: TokenType) => {
-  return new Parser((state) => {
+  return new Parser<Token>((state) => {
     if (state.isError) {
       return state;
     }
@@ -23,3 +23,11 @@ export const token = (token: TokenType) => {
     };
   });
 };
+
+export const number = token(TokenType.Number).map(
+  (token) => (token as TokenValueNode<TokenType.Number, number>).value,
+);
+
+export const string = token(TokenType.String).map(
+  (token) => (token as TokenValueNode<TokenType.String, string>).value,
+);

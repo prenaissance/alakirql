@@ -1,3 +1,4 @@
+import { identity } from "@/common/utilities";
 import { Token } from "@/lexer/tokens";
 
 type ParserSuccessResult<T> = {
@@ -14,7 +15,29 @@ type ParserErrorResult = {
   error: string;
 };
 
+export type SuccessHandler<T, U> = (parserResult: ParserSuccessResult<T>) => U;
+export type ErrorHandler<U> = (parserResult: ParserErrorResult) => U;
+
 export type ParserResult<T> = ParserSuccessResult<T> | ParserErrorResult;
+
+export const match = <T, U>(
+  successHandler: SuccessHandler<T, U>,
+  errorHandler: ErrorHandler<U>,
+) => {
+  return (parserResult: ParserResult<T>) => {
+    if (parserResult.isError) {
+      return errorHandler(parserResult);
+    }
+    return successHandler(parserResult);
+  };
+};
+
+export const getValue = <T>(parserResult: ParserResult<T>) => {
+  return match<T, T | null>(
+    (parserResult) => parserResult.result,
+    () => null,
+  )(parserResult);
+};
 
 const createParserInitialState = (tokens: Token[]): ParserResult<null> => ({
   tokens,
@@ -25,7 +48,9 @@ const createParserInitialState = (tokens: Token[]): ParserResult<null> => ({
 
 export class Parser<T> {
   constructor(
-    readonly parserStateMapper: (state: ParserResult<any>) => ParserResult<T>,
+    readonly parserStateMapper: <U = null>(
+      state: ParserResult<U>,
+    ) => ParserResult<T>,
   ) {}
 
   run(tokens: Token[]): ParserResult<T> {
@@ -34,15 +59,17 @@ export class Parser<T> {
   }
 
   map<U>(mapper: (result: T) => U): Parser<U> {
-    return new Parser((state) => {
-      const result = this.parserStateMapper(state);
-      if (result.isError) {
-        return result;
-      }
-      return {
-        ...result,
-        result: mapper(result.result),
-      };
+    return new Parser<U>((state) => {
+      const resultState = this.parserStateMapper(state);
+      const nextState = match<T, ParserResult<U>>(
+        (parserResult) => ({
+          ...parserResult,
+          result: mapper(parserResult.result),
+        }),
+        identity,
+      )(resultState);
+
+      return nextState;
     });
   }
 }
