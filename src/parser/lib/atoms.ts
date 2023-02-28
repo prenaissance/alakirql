@@ -31,3 +31,15 @@ export const number = token(TokenType.Number).map(
 export const string = token(TokenType.String).map(
   (token) => (token as TokenValueNode<TokenType.String, string>).value,
 );
+
+export const date = token(TokenType.Date).map(
+  (token) => (token as TokenValueNode<TokenType.Date, Date>).value,
+);
+
+export const boolean = token(TokenType.Boolean).map(
+  (token) => (token as TokenValueNode<TokenType.Boolean, boolean>).value,
+);
+
+export const identifier = token(TokenType.Identifier).map(
+  (token) => (token as TokenValueNode<TokenType.Identifier, string>).value,
+);

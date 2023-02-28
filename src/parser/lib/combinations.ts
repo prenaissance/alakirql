@@ -14,7 +14,7 @@ export const sequenceOf = <T>(...parsers: Parser<T, unknown>[]) => {
     }
     return {
       ...currentState,
-      result: results,
+      result: results.filter((x) => x !== undefined && x !== null),
     };
   });
 };
@@ -57,11 +57,15 @@ export const many1 = <T>(parser: Parser<T>) =>
     many(parser),
   ).map(([first, rest]) => [...first, ...rest]);
 
-// ! WIP, need to solve duplicated result
 export const optional = <T>(parser: Parser<T>) => {
-  return new Parser((state) => {
+  return new Parser<T | null>((state) => {
     const result = parser.parserStateMapper(state);
-    return result.isError ? state : result;
+    return result.isError
+      ? {
+          ...state,
+          result: null,
+        }
+      : result;
   });
 };
 
@@ -73,3 +77,19 @@ export const between =
       ([_, result, __]) => result as V,
     );
   };
+
+export const sepBy1 = <T, U>(parser: Parser<T>, separator: Parser<U>) =>
+  sequenceOf(
+    many(sequenceOf<T | U>(parser, separator).map((x) => x[0] as T)),
+    parser.map((x) => [x]),
+  ).map(([results, last]) => [...results, ...last]);
+
+export const sepBy = <T, U>(parser: Parser<T>, separator: Parser<U>) =>
+  optional(sepBy1(parser, separator)).map((x) => x ?? []);
+
+export const lazy = <T>(parserThunk: () => Parser<T>) => {
+  return new Parser<T>((state) => {
+    const parser = parserThunk();
+    return parser.parserStateMapper(state);
+  });
+};

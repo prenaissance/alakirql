@@ -30,4 +30,40 @@ describe("parser atoms", () => {
     const failedResult = P.number.run(assignmentTokens);
     expect(failedResult.isError).toBe(true);
   });
+
+  it("should parse strings", () => {
+    const result = P.string.run(lex('"str"'));
+    expect(result.isError).toBe(false);
+    expect(getValue(result)).toBe("str");
+
+    const failedResult = P.string.run(expressionTokens);
+    expect(failedResult.isError).toBe(true);
+  });
+
+  it("should parse dates", () => {
+    const result = P.date.run(lex("D2021-01-01"));
+    expect(result.isError).toBe(false);
+    expect(getValue(result)).toEqual(new Date("2021-01-01"));
+
+    const failedResult = P.date.run(expressionTokens);
+    expect(failedResult.isError).toBe(true);
+  });
+
+  it("should parse booleans", () => {
+    const result = P.boolean.run(lex("true"));
+    expect(result.isError).toBe(false);
+    expect(getValue(result)).toBe(true);
+
+    const failedResult = P.boolean.run(expressionTokens);
+    expect(failedResult.isError).toBe(true);
+  });
+
+  it("should parse identifiers", () => {
+    const result = P.identifier.run(assignmentTokens);
+    expect(result.isError).toBe(false);
+    expect(getValue(result)).toBe("a");
+
+    const failedResult = P.identifier.run(expressionTokens);
+    expect(failedResult.isError).toBe(true);
+  });
 });
