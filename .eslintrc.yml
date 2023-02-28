@@ -18,8 +18,10 @@ plugins:
   - prettier
 rules:
   eqeqeq: error
-  "import/no-unresolved": "error"
-  "@typescript-eslint/no-non-null-assertion": "off"
+  no-constant-condition: off
+  "import/no-unresolved": error
+  "@typescript-eslint/no-non-null-assertion": off
+  "@typescript-eslint/no-explicit-any": off
 settings:
   "import/parsers": 
     "@typescript-eslint/parser": [".ts", ".tsx"]

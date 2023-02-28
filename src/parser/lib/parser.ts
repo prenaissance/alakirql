@@ -1,6 +1,12 @@
 import { identity } from "@/common/utilities";
 import { Token } from "@/lexer/tokens";
 
+type ParserInitialResult = {
+  tokens: Token[];
+  index: number;
+  isError: false;
+};
+
 type ParserSuccessResult<T> = {
   tokens: Token[];
   index: number;
@@ -39,33 +45,59 @@ export const getValue = <T>(parserResult: ParserResult<T>) => {
   )(parserResult);
 };
 
-const createParserInitialState = (tokens: Token[]): ParserResult<null> => ({
+const createParserInitialState = (tokens: Token[]): ParserInitialResult => ({
   tokens,
   index: 0,
   isError: false,
-  result: null,
 });
 
-export class Parser<T> {
+export class Parser<T, U = any> {
+  readonly parserStateMapper: (state: ParserResult<U>) => ParserResult<T>;
+
   constructor(
-    readonly parserStateMapper: <U = null>(
+    private readonly _parserStateMapper: (
       state: ParserResult<U>,
     ) => ParserResult<T>,
-  ) {}
+  ) {
+    this.parserStateMapper = (state) => {
+      if (state.tokens.length === state.index) {
+        return {
+          ...state,
+          isError: true,
+          error: `Unexpected end of input`,
+        };
+      }
+      return _parserStateMapper(state);
+    };
+  }
 
   run(tokens: Token[]): ParserResult<T> {
     const state = createParserInitialState(tokens);
-    return this.parserStateMapper(state);
+    // TODO: Fix this type assertion and handle initial state better
+    return this.parserStateMapper(state as ParserResult<U>);
   }
 
-  map<U>(mapper: (result: T) => U): Parser<U> {
-    return new Parser<U>((state) => {
-      const resultState = this.parserStateMapper(state);
-      const nextState = match<T, ParserResult<U>>(
+  map<X>(mapper: (result: T) => X): Parser<X> {
+    return new Parser<X>((state) => {
+      const resultState = this.parserStateMapper(state as ParserResult<U>);
+      const nextState = match<T, ParserResult<X>>(
         (parserResult) => ({
           ...parserResult,
           result: mapper(parserResult.result),
         }),
+        identity,
+      )(resultState);
+
+      return nextState;
+    });
+  }
+
+  chain<X>(mapper: (result: T) => Parser<X, T>): Parser<X> {
+    return new Parser<X>((state) => {
+      const resultState = this.parserStateMapper(state as ParserResult<U>);
+      const nextState = match<T, ParserResult<X>>(
+        (parserResult) =>
+          mapper(parserResult.result).parserStateMapper(parserResult),
         identity,
       )(resultState);
 
