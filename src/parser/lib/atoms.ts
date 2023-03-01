@@ -1,5 +1,6 @@
 import { Token, TokenNode, TokenType, TokenValueNode } from "@/lexer/tokens";
 import { Parser } from "./parser";
+import { between } from "./combinations";
 
 export const token = (token: TokenType) => {
   return new Parser<Token>((state) => {
@@ -42,4 +43,17 @@ export const boolean = token(TokenType.Boolean).map(
 
 export const identifier = token(TokenType.Identifier).map(
   (token) => (token as TokenValueNode<TokenType.Identifier, string>).value,
+);
+
+export const betweenBrackets = between(
+  token(TokenType.OpenBracket),
+  token(TokenType.CloseBracket),
+);
+export const betweenSquareBrackets = between(
+  token(TokenType.OpenSquareBracket),
+  token(TokenType.CloseSquareBracket),
+);
+export const betweenCurlyBrackets = between(
+  token(TokenType.OpenCurlyBracket),
+  token(TokenType.CloseCurlyBracket),
 );
