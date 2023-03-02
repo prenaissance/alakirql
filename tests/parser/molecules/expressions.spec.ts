@@ -65,4 +65,69 @@ describe("parser molecules -> expressions", () => {
       },
     });
   });
+
+  it("should access object property", () => {
+    const result = M.memberExpressionNode.run(lex("a.b"));
+    expect(getValue(result)).toEqual({
+      type: NodeType.MemberExpression,
+      object: {
+        type: NodeType.Identifier,
+        name: "a",
+      },
+      property: {
+        type: NodeType.Identifier,
+        name: "b",
+      },
+    });
+  });
+
+  it("should access object literal property", () => {
+    const result = M.memberExpressionNode.run(lex("{a: 1}.a"));
+    expect(getValue(result)).toEqual({
+      type: NodeType.MemberExpression,
+      object: {
+        type: NodeType.ObjectExpression,
+        properties: [
+          {
+            type: NodeType.Property,
+            key: {
+              type: NodeType.Identifier,
+              name: "a",
+            },
+            value: {
+              type: NodeType.Literal,
+              kind: LiteralType.Number,
+              value: 1,
+            },
+          },
+        ],
+      },
+      property: {
+        type: NodeType.Identifier,
+        name: "a",
+      },
+    });
+  });
+
+  it("should access nested object property", () => {
+    const result = M.memberExpressionNode.run(lex("a.b.c"));
+    expect(getValue(result)).toEqual({
+      type: NodeType.MemberExpression,
+      object: {
+        type: NodeType.MemberExpression,
+        object: {
+          type: NodeType.Identifier,
+          name: "a",
+        },
+        property: {
+          type: NodeType.Identifier,
+          name: "b",
+        },
+      },
+      property: {
+        type: NodeType.Identifier,
+        name: "c",
+      },
+    });
+  });
 });
