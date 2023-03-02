@@ -22,6 +22,7 @@ export const symbolMap = new Map<string, TokenType>([
   ["(", TokenType.OpenBracket],
   [")", TokenType.CloseBracket],
   [",", TokenType.Comma],
+  [".", TokenType.Dot],
   ["=", TokenType.Assignment],
   ["+", TokenType.Plus],
   ["-", TokenType.Minus],

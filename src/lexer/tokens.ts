@@ -26,6 +26,7 @@ export enum TokenType {
   OpenSquareBracket = "OpenSquareBracket",
   CloseSquareBracket = "CloseSquareBracket",
   Comma = "Comma",
+  Dot = "Dot",
 
   // Operators
   Assignment = "Assignment",
@@ -84,6 +85,7 @@ export type Token =
   | TokenNode<TokenType.OpenSquareBracket>
   | TokenNode<TokenType.CloseSquareBracket>
   | TokenNode<TokenType.Comma>
+  | TokenNode<TokenType.Dot>
   // Operators
   | TokenNode<TokenType.Assignment>
   | TokenNode<TokenType.Plus>

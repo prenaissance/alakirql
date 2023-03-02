@@ -311,4 +311,45 @@ describe("lexer", () => {
     const expression = "const as&b = 1";
     expect(() => lex(expression)).toThrowError(new LexingError("&b", 8));
   });
+
+  it("should lex property accessors", () => {
+    const expression = "a.b.c";
+    const expectedTokens = [
+      {
+        type: TokenType.Identifier,
+        value: "a",
+        meta: {
+          index: 0,
+        },
+      },
+      {
+        type: TokenType.Dot,
+        meta: {
+          index: 1,
+        },
+      },
+      {
+        type: TokenType.Identifier,
+        value: "b",
+        meta: {
+          index: 2,
+        },
+      },
+      {
+        type: TokenType.Dot,
+        meta: {
+          index: 3,
+        },
+      },
+      {
+        type: TokenType.Identifier,
+        value: "c",
+        meta: {
+          index: 4,
+        },
+      },
+    ];
+    const tokens = lex(expression);
+    expect(tokens).toEqual(expectedTokens);
+  });
 });
