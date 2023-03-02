@@ -25,7 +25,8 @@
   },
   "include": [
     "**/*.d.ts",
-    "src"
+    "src",
+    "tests"
   ],
   "exclude": [
     "node_modules"

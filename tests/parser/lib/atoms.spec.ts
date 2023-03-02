@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { TokenType } from "../../../src/lexer/tokens";
-import lex from "../../../src/lexer";
-import P from "../../../src/parser/lib";
-import { getValue } from "../../../src/parser/lib/parser";
+import { TokenType } from "@/lexer/tokens";
+import lex from "@/lexer";
+import P from "@/parser/lib";
+import { getValue } from "@/parser/lib/parser";
 
 const expressionTokens = lex("1 + 2 * 3 - 4 / 5");
 const assignmentTokens = lex('a = "str"');

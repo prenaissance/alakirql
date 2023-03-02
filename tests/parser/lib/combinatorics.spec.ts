@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { TokenNode, TokenType } from "../../../src/lexer/tokens";
-import lex from "../../../src/lexer";
-import P from "../../../src/parser/lib";
+import { TokenNode, TokenType } from "@/lexer/tokens";
+import lex from "@/lexer";
+import P from "@/parser/lib";
+import { Parser } from "@/parser/lib/parser";
 
 const expressionTokens = lex("1 + 2 * 3 - 4 / 5");
 const inArray = P.between(
@@ -121,11 +122,11 @@ describe("parser combinatorics", () => {
   });
 
   it("should parse separated tokens (1 +) for variable declarations", () => {
-    const parser = P.sequenceOf(
+    const parser = P.sequenceOf<any>(
       P.token(TokenType.MutableDeclaration),
-      P.sepBy1(
-        P.oneOf(
-          P.sequenceOf(
+      P.sepBy1<any, any>(
+        P.oneOf<any>(
+          P.sequenceOf<any>(
             P.token(TokenType.Identifier),
             P.token(TokenType.Assignment),
             P.number,
@@ -146,19 +147,22 @@ describe("parser combinatorics", () => {
   });
 
   it("should parse contextually with 'chain", () => {
-    const parser = P.oneOf<
-      TokenNode<TokenType.LessThan> | TokenNode<TokenType.GreaterThan>
-    >(P.token(TokenType.LessThan), P.token(TokenType.GreaterThan)).chain(
-      ({ type }) => {
-        switch (type) {
-          case TokenType.LessThan:
-            return P.number.map((n) => `less than ${n}`);
+    const parser = (
+      P.oneOf(
+        P.token(TokenType.LessThan),
+        P.token(TokenType.GreaterThan),
+      ) as Parser<
+        TokenNode<TokenType.LessThan> | TokenNode<TokenType.GreaterThan>
+      >
+    ).chain(({ type }) => {
+      switch (type) {
+        case TokenType.LessThan:
+          return P.number.map((n) => `less than ${n}`);
 
-          case TokenType.GreaterThan:
-            return P.number.map((n) => `greater than ${n}`);
-        }
-      },
-    );
+        case TokenType.GreaterThan:
+          return P.number.map((n) => `greater than ${n}`);
+      }
+    });
 
     const result = parser.run(lex("< 1"));
     expect(!result.isError && result.result).toBe("less than 1");
