@@ -3,8 +3,10 @@ import { TokenType } from "@/lexer/tokens";
 export enum NodeType {
   Program = "Program",
   Statement = "Statement",
+  Property = "Property",
   Expression = "Expression",
   ArrayExpression = "ArrayExpression",
+  ObjectExpression = "ObjectExpression",
   BinaryExpression = "BinaryExpression",
   UnaryExpression = "UnaryExpression",
   IndexingExpression = "IndexingExpression",
@@ -42,7 +44,8 @@ export type Expression =
   | Literal
   | IndexingExpression
   | MemberExpression
-  | CallExpression;
+  | CallExpression
+  | ObjectExpression;
 
 export interface NumericLiteral extends Statement {
   type: NodeType.Literal;
@@ -116,6 +119,16 @@ export interface CallExpression extends Statement {
   type: NodeType.CallExpression;
   callee: Expression;
   arguments: Expression[];
+}
+export interface Property extends Statement {
+  type: NodeType.Property;
+  key: Identifier;
+  value: Expression;
+}
+
+export interface ObjectExpression extends Statement {
+  type: NodeType.ObjectExpression;
+  properties: Property[];
 }
 
 export interface ExpressionStatement extends Statement {

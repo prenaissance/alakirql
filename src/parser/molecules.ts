@@ -11,8 +11,11 @@ import {
   IndexingExpression,
   Literal,
   LiteralType,
+  MemberExpression,
   NodeType,
   NumericLiteral,
+  ObjectExpression,
+  Property,
   StringLiteral,
   VariableDeclaration,
   VariableDeclarator,
@@ -22,6 +25,7 @@ import {
   additiveOperator,
   binaryOperatorTokens,
   comparisonOperator,
+  identifier,
   logicalOperator,
   multiplicativeOperator,
 } from "./lib/atoms";
@@ -69,7 +73,12 @@ export const literalNode = P.oneOf<Literal>(
 );
 
 const noPrecedenceExpressionNode: Parser<Expression> = P.lazy(() =>
-  P.oneOf<Expression>(literalNode, identifierNode, arrayExpressionNode),
+  P.oneOf<Expression>(
+    literalNode,
+    identifierNode,
+    arrayExpressionNode,
+    objectExpressionNode,
+  ),
 );
 
 // TODO: Add support for unary expressions
@@ -137,29 +146,67 @@ export const arrayExpressionNode: Parser<ArrayExpression> =
     elements,
   }));
 
-const buildIndexTree = (
-  object: Expression,
-  indices: Expression[],
-): IndexingExpression => {
-  if (indices.length === 0) {
-    return object as IndexingExpression;
-  }
-  const index = indices[indices.length - 1];
-  return {
-    type: NodeType.IndexingExpression,
-    object: buildIndexTree(object, indices.slice(0, -1)),
-    index,
-  } as IndexingExpression;
-};
-
 export const indexingExpressionNode = leftToRightExpressionNode.chain(
   (object) => {
     return P.many1(P.betweenSquareBrackets(leftToRightExpressionNode)).map(
       (indexes) => {
-        return buildIndexTree(object, indexes);
+        return indexes.reduce(
+          (node, index) =>
+            ({
+              type: NodeType.IndexingExpression,
+              object: node,
+              index,
+            } as IndexingExpression),
+          object,
+        );
       },
     );
   },
+);
+
+export const objectExpressionNode: Parser<ObjectExpression> = P.lazy(() =>
+  P.betweenCurlyBrackets(
+    P.sepBy(
+      (
+        P.sequenceOf<Identifier | Token | Expression>(
+          identifierNode,
+          P.token(TokenType.Colon),
+          leftToRightExpressionNode,
+        ) as Parser<[Identifier, Token, Expression]>
+      ).map<Property>(([identifier, , value]) => ({
+        type: NodeType.Property,
+        key: identifier,
+        value,
+      })),
+      P.token(TokenType.Comma),
+    ).map(
+      (properties) =>
+        ({
+          type: NodeType.ObjectExpression,
+          properties,
+        } as ObjectExpression),
+    ),
+  ),
+);
+
+export const memberExpressionNode = leftToRightExpressionNode.chain((object) =>
+  P.many1(
+    P.sequenceOf<any>(P.token(TokenType.Dot), identifierNode) as Parser<
+      [TokenNode<TokenType.Dot>, Identifier]
+    >,
+  ).map((pairs) =>
+    pairs
+      .map(([, identifier]) => identifier)
+      .reduce(
+        (node, property) =>
+          ({
+            type: NodeType.MemberExpression,
+            object: node,
+            property,
+          } as MemberExpression),
+        object,
+      ),
+  ),
 );
 
 const buildTree = (
