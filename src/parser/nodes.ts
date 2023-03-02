@@ -74,7 +74,6 @@ export type Literal =
   | StringLiteral
   | BooleanLiteral
   | DateLiteral
-  | Null
   | null;
 
 export interface ArrayExpression extends Statement {

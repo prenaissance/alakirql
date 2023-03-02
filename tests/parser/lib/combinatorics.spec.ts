@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { TokenType } from "../../../src/lexer/tokens";
+import { TokenNode, TokenType } from "../../../src/lexer/tokens";
 import lex from "../../../src/lexer";
 import P from "../../../src/parser/lib";
 
@@ -51,6 +51,13 @@ describe("parser combinatorics", () => {
     expect(plusResult.index).toBe(1);
   });
 
+  it("should parse exactly 1 token with 'many'", () => {
+    const parser = P.many(P.token(TokenType.Number));
+    const result = parser.run(lex("123"));
+    expect(result.isError).toBe(false);
+    expect(result.index).toBe(1);
+  });
+
   it("should parse zero or more tokens with 'many'", () => {
     const parser = P.many(P.token(TokenType.Number));
     const result = parser.run(lex("123 456 789"));
@@ -59,7 +66,23 @@ describe("parser combinatorics", () => {
 
     const emptyResult = parser.run(lex("a"));
     expect(emptyResult.isError).toBe(false);
+    expect(!emptyResult.isError && emptyResult.result).toEqual([]);
     expect(emptyResult.index).toBe(0);
+
+    const alsoEmptyResult = parser.run(lex(""));
+    expect(alsoEmptyResult.isError).toBe(false);
+    expect(!alsoEmptyResult.isError && alsoEmptyResult.result).toEqual([]);
+  });
+
+  it("should parse exactly 1 token with many1", () => {
+    const parser = P.many1(P.token(TokenType.Number));
+    const result = parser.run(lex("123"));
+    console.log(result);
+    expect(result.isError).toBe(false);
+    expect(result.index).toBe(1);
+
+    const emptyResult = parser.run(lex("a"));
+    expect(emptyResult.isError).toBe(true);
   });
 
   it("should parse one or more tokens with 'many1'", () => {
@@ -120,6 +143,33 @@ describe("parser combinatorics", () => {
     expect(result2.isError).toBe(false);
     const errorResult = parser.run(lex("declare"));
 
+    expect(errorResult.isError).toBe(true);
+  });
+
+  it("should parse contextually with 'chain", () => {
+    const parser = P.oneOf<
+      TokenNode<TokenType.LessThan> | TokenNode<TokenType.GreaterThan>
+    >(P.token(TokenType.LessThan), P.token(TokenType.GreaterThan)).chain(
+      ({ type }) => {
+        switch (type) {
+          case TokenType.LessThan:
+            return P.number.map((n) => `less than ${n}`);
+
+          case TokenType.GreaterThan:
+            return P.number.map((n) => `greater than ${n}`);
+        }
+      },
+    );
+
+    const result = parser.run(lex("< 1"));
+    expect(!result.isError && result.result).toBe("less than 1");
+    expect(result.index).toBe(2);
+
+    const result2 = parser.run(lex("> 1"));
+    expect(!result2.isError && result2.result).toBe("greater than 1");
+    expect(result2.index).toBe(2);
+
+    const errorResult = parser.run(lex("= 1"));
     expect(errorResult.isError).toBe(true);
   });
 });

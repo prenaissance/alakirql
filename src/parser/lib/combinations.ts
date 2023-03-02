@@ -39,10 +39,13 @@ export const many = <T>(parser: Parser<T>) => {
     let currentState: ParserResult<T> = state as ParserResult<T>;
     while (true) {
       const result = parser.parserStateMapper(currentState);
+
       if (result.isError) {
         return {
           ...currentState,
           result: results,
+          isError: false,
+          error: undefined,
         };
       }
       results.push(result.result);
@@ -52,10 +55,7 @@ export const many = <T>(parser: Parser<T>) => {
 };
 
 export const many1 = <T>(parser: Parser<T>) =>
-  sequenceOf<T[]>(
-    parser.map((x) => [x]),
-    many(parser),
-  ).map(([first, rest]) => [...first, ...rest]);
+  parser.chain((first) => many(parser).map((rest) => [first, ...rest]));
 
 export const optional = <T>(parser: Parser<T>) => {
   return new Parser<T | null>((state) => {

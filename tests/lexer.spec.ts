@@ -5,6 +5,12 @@ import { TokenType } from "../src/lexer/tokens";
 import { LexingError } from "../src/lexer/errors";
 
 describe("lexer", () => {
+  it("should lex nothing", () => {
+    const expression = "";
+    const expectedTokens: any[] = [];
+    const tokens = lex(expression);
+    expect(tokens).toEqual(expectedTokens);
+  });
   it("should lex mathematical expressions", () => {
     const expression = "1 + 2 * 3 - 4 / 5";
     const expectedTokens = [

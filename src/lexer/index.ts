@@ -38,7 +38,6 @@ const getLookaheadToken = getFirstMatch(
 
 function getNextToken(input: Input): Readonly<[Input, Token]> {
   const char = input.input[input.index];
-  // dry out if you want
   if (isIgnore(char)) {
     return getNextToken(createInput(input.input, input.index + 1));
   }

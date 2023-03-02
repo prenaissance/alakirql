@@ -84,7 +84,7 @@ describe("parser molecules", () => {
       });
 
       it("should parse array literals with nested array elements", () => {
-        const result = M.arrayExpressionNode.run(lex("[[1, 2], [3, 4]]"));
+        const result = M.arrayExpressionNode.run(lex("[[1, 2],5, [3, 4]]"));
         expect(!result.isError && result.result).toEqual({
           type: NodeType.ArrayExpression,
           elements: [
@@ -102,6 +102,11 @@ describe("parser molecules", () => {
                   value: 2,
                 },
               ],
+            },
+            {
+              type: NodeType.Literal,
+              kind: LiteralType.Number,
+              value: 5,
             },
             {
               type: NodeType.ArrayExpression,
@@ -228,8 +233,79 @@ describe("parser molecules", () => {
   });
 
   describe("expressions", () => {
-    it.todo("should parser binary expressions with precedence", () => {
-      ("");
+    it("should parse single multiplicative expressions", () => {
+      const result = M.multiplicativeExpressionNode.run(lex("1 * 2"));
+      expect(!result.isError && result.result).toEqual({
+        type: NodeType.BinaryExpression,
+        operator: TokenType.Multiply,
+        left: {
+          type: NodeType.Literal,
+          kind: LiteralType.Number,
+          value: 1,
+        },
+        right: {
+          type: NodeType.Literal,
+          kind: LiteralType.Number,
+          value: 2,
+        },
+      });
+    });
+
+    it("should parse multiplicative expressions in order", () => {
+      const result = M.multiplicativeExpressionNode.run(lex("1 * 2 / 3"));
+      expect(!result.isError && result.result).toEqual({
+        type: NodeType.BinaryExpression,
+        operator: TokenType.Divide,
+        left: {
+          type: NodeType.BinaryExpression,
+          operator: TokenType.Multiply,
+          left: {
+            type: NodeType.Literal,
+            kind: LiteralType.Number,
+            value: 1,
+          },
+          right: {
+            type: NodeType.Literal,
+            kind: LiteralType.Number,
+            value: 2,
+          },
+        },
+        right: {
+          type: NodeType.Literal,
+          kind: LiteralType.Number,
+          value: 3,
+        },
+      });
+    });
+
+    it("should parse additive expressions in order", () => {
+      const result = M.additiveExpressionNode.run(lex("1 + 2 - a"));
+      expect(!result.isError && result.result).toEqual({
+        type: NodeType.BinaryExpression,
+        operator: TokenType.Minus,
+        left: {
+          type: NodeType.BinaryExpression,
+          operator: TokenType.Plus,
+          left: {
+            type: NodeType.Literal,
+            kind: LiteralType.Number,
+            value: 1,
+          },
+          right: {
+            type: NodeType.Literal,
+            kind: LiteralType.Number,
+            value: 2,
+          },
+        },
+        right: {
+          type: NodeType.Identifier,
+          name: "a",
+        },
+      });
+    });
+
+    it.todo("should prioritize additive expressions in parantheses", () => {
+      const result = M.additiveExpressionNode.run(lex("a + b"));
     });
   });
 });

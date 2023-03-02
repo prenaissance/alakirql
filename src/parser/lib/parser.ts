@@ -61,11 +61,12 @@ export class Parser<T, U = any> {
   ) {
     this.parserStateMapper = (state) => {
       if (state.tokens.length === state.index) {
-        return {
+        const errorState = {
           ...state,
           isError: true,
           error: `Unexpected end of input`,
-        };
+        } as ParserErrorResult;
+        return _parserStateMapper(errorState);
       }
       return _parserStateMapper(state);
     };
