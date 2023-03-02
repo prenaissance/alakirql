@@ -66,4 +66,25 @@ describe("parser atoms", () => {
     const failedResult = P.identifier.run(expressionTokens);
     expect(failedResult.isError).toBe(true);
   });
+
+  it.skip("should parse expressions between many brackets", () => {
+    const result = P.betweenManyBrackets(P.number).run(lex("((1))"));
+    expect(result.isError).toBe(false);
+    expect(P.getValue(result)).toBe(1);
+
+    const noBracketsResult = P.betweenManyBrackets(P.number).run(lex("1"));
+
+    expect(noBracketsResult.isError).toBe(false);
+    expect(P.getValue(noBracketsResult)).toBe(1);
+  });
+
+  it.skip("should parse expressions between many brackets, but at least 1", () => {
+    const result = P.betweenMany1Brackets(P.number).run(lex("((1))"));
+    expect(result.isError).toBe(false);
+    expect(P.getValue(result)).toBe(1);
+
+    const noBracketsResult = P.betweenMany1Brackets(P.number).run(lex("1"));
+
+    expect(noBracketsResult.isError).toBe(true);
+  });
 });

@@ -232,7 +232,7 @@ describe("parser molecules", () => {
     });
   });
 
-  describe("expressions", () => {
+  describe("binary expressions", () => {
     it("should parse single multiplicative expressions", () => {
       const result = M.multiplicativeExpressionNode.run(lex("1 * 2"));
       expect(!result.isError && result.result).toEqual({
@@ -304,8 +304,110 @@ describe("parser molecules", () => {
       });
     });
 
-    it.todo("should prioritize additive expressions in parantheses", () => {
-      const result = M.additiveExpressionNode.run(lex("a + b"));
+    it("should prioritize multiplicative expressions over additive", () => {
+      const result = M.additiveExpressionNode.run(lex("a + b * c"));
+      expect(!result.isError && result.result).toEqual({
+        type: NodeType.BinaryExpression,
+        operator: TokenType.Plus,
+        left: {
+          type: NodeType.Identifier,
+          name: "a",
+        },
+        right: {
+          type: NodeType.BinaryExpression,
+          operator: TokenType.Multiply,
+          left: {
+            type: NodeType.Identifier,
+            name: "b",
+          },
+          right: {
+            type: NodeType.Identifier,
+            name: "c",
+          },
+        },
+      });
+    });
+
+    it("should prioritize additive expressions in parentheses", () => {
+      const result = M.additiveExpressionNode.run(lex("a + (b - a)"));
+      expect(!result.isError && result.result).toEqual({
+        type: NodeType.BinaryExpression,
+        operator: TokenType.Plus,
+        left: {
+          type: NodeType.Identifier,
+          name: "a",
+        },
+        right: {
+          type: NodeType.BinaryExpression,
+          operator: TokenType.Minus,
+          left: {
+            type: NodeType.Identifier,
+            name: "b",
+          },
+          right: {
+            type: NodeType.Identifier,
+            name: "a",
+          },
+        },
+      });
+    });
+
+    it("should accept as many brackets as you want around parameters", () => {
+      const result = M.additiveExpressionNode.run(lex("(a + (b)) - (a)"));
+      const noBracketResult = M.additiveExpressionNode.run(lex("a + b - a"));
+      expect(result.isError).toBe(false);
+      expect(noBracketResult.isError).toBe(false);
+      expect(!result.isError && result.result).toEqual(
+        !noBracketResult.isError && noBracketResult.result,
+      );
+    });
+
+    it("should prioritize multiplicative expressions over comparison", () => {
+      const result = M.comparisonExpressionNode.run(lex("a * b >= c"));
+      expect(!result.isError && result.result).toEqual({
+        type: NodeType.BinaryExpression,
+        operator: TokenType.GreaterThanOrEqual,
+        left: {
+          type: NodeType.BinaryExpression,
+          operator: TokenType.Multiply,
+          left: {
+            type: NodeType.Identifier,
+            name: "a",
+          },
+          right: {
+            type: NodeType.Identifier,
+            name: "b",
+          },
+        },
+        right: {
+          type: NodeType.Identifier,
+          name: "c",
+        },
+      });
+    });
+
+    it("should prioritize comparison expressions over logical", () => {
+      const result = M.logicalExpressionNode.run(lex("a >= b && c"));
+      expect(!result.isError && result.result).toEqual({
+        type: NodeType.BinaryExpression,
+        operator: TokenType.And,
+        left: {
+          type: NodeType.BinaryExpression,
+          operator: TokenType.GreaterThanOrEqual,
+          left: {
+            type: NodeType.Identifier,
+            name: "a",
+          },
+          right: {
+            type: NodeType.Identifier,
+            name: "b",
+          },
+        },
+        right: {
+          type: NodeType.Identifier,
+          name: "c",
+        },
+      });
     });
   });
 });

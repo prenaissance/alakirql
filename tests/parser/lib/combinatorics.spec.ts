@@ -77,7 +77,6 @@ describe("parser combinatorics", () => {
   it("should parse exactly 1 token with many1", () => {
     const parser = P.many1(P.token(TokenType.Number));
     const result = parser.run(lex("123"));
-    console.log(result);
     expect(result.isError).toBe(false);
     expect(result.index).toBe(1);
 

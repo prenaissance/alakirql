@@ -16,6 +16,14 @@ import {
   VariableDeclaration,
   VariableDeclarator,
 } from "./nodes";
+import {
+  BinaryOperatorTokenNode,
+  additiveOperator,
+  binaryOperatorTokens,
+  comparisonOperator,
+  logicalOperator,
+  multiplicativeOperator,
+} from "./lib/atoms";
 
 export const numericLiteralNode: Parser<NumericLiteral> = P.number.map(
   (value) => ({
@@ -59,13 +67,13 @@ export const literalNode = P.oneOf<Literal>(
   dateLiteralNode,
 );
 
-// TODO: Add support for expressions
+// TODO: Add support for unary expressions
 export const expressionNode = P.lazy(() =>
   P.oneOf<Expression>(
+    binaryExpressionNode,
+    arrayExpressionNode,
     literalNode,
     identifierNode,
-    arrayExpressionNode,
-    binaryExpressionNode,
   ),
 );
 
@@ -129,28 +137,6 @@ export const arrayExpressionNode: Parser<ArrayExpression> =
     elements,
   }));
 
-const binaryOperatorTokens = [
-  TokenType.Plus,
-  TokenType.Minus,
-  TokenType.Multiply,
-  TokenType.Divide,
-  TokenType.Modulo,
-  TokenType.Exponent,
-] as const;
-type BinaryOperatorToken = (typeof binaryOperatorTokens)[number];
-type BinaryOperatorTokenNode = TokenNode<BinaryOperatorToken>;
-
-const additiveOperator = P.oneOf(
-  P.token(TokenType.Plus),
-  P.token(TokenType.Minus),
-) as Parser<BinaryOperatorTokenNode>;
-
-const multiplicativeOperator = P.oneOf(
-  P.token(TokenType.Multiply),
-  P.token(TokenType.Divide),
-  P.token(TokenType.Modulo),
-) as Parser<BinaryOperatorTokenNode>;
-
 const buildTree = (
   end: Expression,
   rest: Readonly<[Expression, BinaryOperatorTokenNode]>[],
@@ -192,14 +178,39 @@ const binaryExpression =
 
 export const multiplicativeExpressionNode = binaryExpression(
   multiplicativeOperator,
-)(P.oneOf(noPrecedenceExpressionNode, P.betweenBrackets(expressionNode)));
+)(P.oneOf(P.betweenBrackets(expressionNode), noPrecedenceExpressionNode));
 
-export const additiveExpressionNode = binaryExpression(additiveOperator)(
+export const additiveExpressionNode: Parser<BinaryExpression> =
+  binaryExpression(additiveOperator)(
+    P.oneOf(
+      P.betweenBrackets(expressionNode),
+      multiplicativeExpressionNode,
+      noPrecedenceExpressionNode,
+    ),
+  );
+
+export const comparisonExpressionNode = binaryExpression(comparisonOperator)(
   P.oneOf(
+    P.betweenBrackets(expressionNode),
+    additiveExpressionNode,
     multiplicativeExpressionNode,
     noPrecedenceExpressionNode,
-    P.betweenBrackets(expressionNode),
   ),
 );
 
-export const binaryExpressionNode = additiveExpressionNode;
+export const logicalExpressionNode = binaryExpression(logicalOperator)(
+  P.oneOf(
+    P.betweenBrackets(expressionNode),
+    comparisonExpressionNode,
+    additiveExpressionNode,
+    multiplicativeExpressionNode,
+    noPrecedenceExpressionNode,
+  ),
+);
+
+export const binaryExpressionNode = P.oneOf(
+  logicalExpressionNode,
+  comparisonExpressionNode,
+  additiveExpressionNode,
+  multiplicativeExpressionNode,
+);
