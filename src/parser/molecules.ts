@@ -5,6 +5,7 @@ import {
   ArrayExpression,
   BinaryExpression,
   BooleanLiteral,
+  CallExpression,
   DateLiteral,
   Expression,
   Identifier,
@@ -87,7 +88,12 @@ export const leftToRightExpressionNode: Parser<Expression> = P.lazy(() =>
 );
 
 export const expressionNode: Parser<Expression> = P.lazy(() =>
-  P.oneOf<Expression>(leftToRightExpressionNode, indexingExpressionNode),
+  P.oneOf<Expression>(
+    indexingExpressionNode,
+    memberExpressionNode,
+    callExpressionNode,
+    leftToRightExpressionNode,
+  ),
 );
 
 const valueVariableDeclaratorNode = P.sequenceOf<
@@ -148,19 +154,17 @@ export const arrayExpressionNode: Parser<ArrayExpression> =
 
 export const indexingExpressionNode = leftToRightExpressionNode.chain(
   (object) => {
-    return P.many1(P.betweenSquareBrackets(leftToRightExpressionNode)).map(
-      (indexes) => {
-        return indexes.reduce(
-          (node, index) =>
-            ({
-              type: NodeType.IndexingExpression,
-              object: node,
-              index,
-            } as IndexingExpression),
-          object,
-        );
-      },
-    );
+    return P.many1(P.betweenSquareBrackets(expressionNode)).map((indexes) => {
+      return indexes.reduce(
+        (node, index) =>
+          ({
+            type: NodeType.IndexingExpression,
+            object: node,
+            index,
+          } as IndexingExpression),
+        object,
+      );
+    });
   },
 );
 
@@ -171,7 +175,7 @@ export const objectExpressionNode: Parser<ObjectExpression> = P.lazy(() =>
         P.sequenceOf<Identifier | Token | Expression>(
           identifierNode,
           P.token(TokenType.Colon),
-          leftToRightExpressionNode,
+          expressionNode,
         ) as Parser<[Identifier, Token, Expression]>
       ).map<Property>(([identifier, , value]) => ({
         type: NodeType.Property,
@@ -208,6 +212,23 @@ export const memberExpressionNode = leftToRightExpressionNode.chain((object) =>
       ),
   ),
 );
+
+export const callExpressionNode: Parser<CallExpression> =
+  leftToRightExpressionNode.chain(
+    (callee) =>
+      P.many(
+        P.betweenBrackets(P.sepBy(expressionNode, P.token(TokenType.Comma))),
+      ).map<CallExpression>((args) =>
+        args.reduce(
+          (node, args) => ({
+            type: NodeType.CallExpression,
+            callee: node,
+            arguments: args,
+          }),
+          callee as unknown as CallExpression,
+        ),
+      ) as Parser<CallExpression>,
+  );
 
 const buildTree = (
   end: Expression,
