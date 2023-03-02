@@ -8,6 +8,7 @@ import {
   DateLiteral,
   Expression,
   Identifier,
+  IndexingExpression,
   Literal,
   LiteralType,
   NodeType,
@@ -67,18 +68,17 @@ export const literalNode = P.oneOf<Literal>(
   dateLiteralNode,
 );
 
-// TODO: Add support for unary expressions
-export const expressionNode = P.lazy(() =>
-  P.oneOf<Expression>(
-    binaryExpressionNode,
-    arrayExpressionNode,
-    literalNode,
-    identifierNode,
-  ),
+const noPrecedenceExpressionNode: Parser<Expression> = P.lazy(() =>
+  P.oneOf<Expression>(literalNode, identifierNode, arrayExpressionNode),
 );
 
-const noPrecedenceExpressionNode = P.lazy(() =>
-  P.oneOf<Expression>(literalNode, identifierNode, arrayExpressionNode),
+// TODO: Add support for unary expressions
+export const leftToRightExpressionNode: Parser<Expression> = P.lazy(() =>
+  P.oneOf<Expression>(binaryExpressionNode, noPrecedenceExpressionNode),
+);
+
+export const expressionNode: Parser<Expression> = P.lazy(() =>
+  P.oneOf<Expression>(leftToRightExpressionNode, indexingExpressionNode),
 );
 
 const valueVariableDeclaratorNode = P.sequenceOf<
@@ -86,7 +86,7 @@ const valueVariableDeclaratorNode = P.sequenceOf<
 >(
   identifierNode,
   P.token(TokenType.Assignment),
-  expressionNode,
+  leftToRightExpressionNode,
 ).map<VariableDeclarator>(([identifier, , value]) => ({
   type: NodeType.VariableDeclarator,
   id: identifier as Identifier,
@@ -131,11 +131,36 @@ export const variableDeclarationNode = P.sequenceOf<
 
 export const arrayExpressionNode: Parser<ArrayExpression> =
   P.betweenSquareBrackets(
-    P.sepBy(expressionNode, P.token(TokenType.Comma)),
+    P.sepBy(leftToRightExpressionNode, P.token(TokenType.Comma)),
   ).map((elements) => ({
     type: NodeType.ArrayExpression,
     elements,
   }));
+
+const buildIndexTree = (
+  object: Expression,
+  indices: Expression[],
+): IndexingExpression => {
+  if (indices.length === 0) {
+    return object as IndexingExpression;
+  }
+  const index = indices[indices.length - 1];
+  return {
+    type: NodeType.IndexingExpression,
+    object: buildIndexTree(object, indices.slice(0, -1)),
+    index,
+  } as IndexingExpression;
+};
+
+export const indexingExpressionNode = leftToRightExpressionNode.chain(
+  (object) => {
+    return P.many1(P.betweenSquareBrackets(leftToRightExpressionNode)).map(
+      (indexes) => {
+        return buildIndexTree(object, indexes);
+      },
+    );
+  },
+);
 
 const buildTree = (
   end: Expression,
@@ -178,12 +203,17 @@ const binaryExpression =
 
 export const multiplicativeExpressionNode = binaryExpression(
   multiplicativeOperator,
-)(P.oneOf(P.betweenBrackets(expressionNode), noPrecedenceExpressionNode));
+)(
+  P.oneOf(
+    P.betweenBrackets(leftToRightExpressionNode),
+    noPrecedenceExpressionNode,
+  ),
+);
 
 export const additiveExpressionNode: Parser<BinaryExpression> =
   binaryExpression(additiveOperator)(
     P.oneOf(
-      P.betweenBrackets(expressionNode),
+      P.betweenBrackets(leftToRightExpressionNode),
       multiplicativeExpressionNode,
       noPrecedenceExpressionNode,
     ),
@@ -191,7 +221,7 @@ export const additiveExpressionNode: Parser<BinaryExpression> =
 
 export const comparisonExpressionNode = binaryExpression(comparisonOperator)(
   P.oneOf(
-    P.betweenBrackets(expressionNode),
+    P.betweenBrackets(leftToRightExpressionNode),
     additiveExpressionNode,
     multiplicativeExpressionNode,
     noPrecedenceExpressionNode,
@@ -200,7 +230,7 @@ export const comparisonExpressionNode = binaryExpression(comparisonOperator)(
 
 export const logicalExpressionNode = binaryExpression(logicalOperator)(
   P.oneOf(
-    P.betweenBrackets(expressionNode),
+    P.betweenBrackets(leftToRightExpressionNode),
     comparisonExpressionNode,
     additiveExpressionNode,
     multiplicativeExpressionNode,

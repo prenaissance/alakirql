@@ -7,6 +7,9 @@ export enum NodeType {
   ArrayExpression = "ArrayExpression",
   BinaryExpression = "BinaryExpression",
   UnaryExpression = "UnaryExpression",
+  IndexingExpression = "IndexingExpression",
+  MemberExpression = "MemberExpression",
+  CallExpression = "CallExpression",
   ExpressionStatement = "ExpressionStatement",
   Identifier = "Identifier",
   Literal = "Literal",
@@ -36,7 +39,10 @@ export type Expression =
   | BinaryExpression
   | UnaryExpression
   | Identifier
-  | Literal;
+  | Literal
+  | IndexingExpression
+  | MemberExpression
+  | CallExpression;
 
 export interface NumericLiteral extends Statement {
   type: NodeType.Literal;
@@ -92,6 +98,24 @@ export interface UnaryExpression extends Statement {
   type: NodeType.UnaryExpression;
   operator: string;
   argument: Expression;
+}
+
+export interface IndexingExpression extends Statement {
+  type: NodeType.IndexingExpression;
+  object: Expression;
+  index: Expression;
+}
+
+export interface MemberExpression extends Statement {
+  type: NodeType.MemberExpression;
+  object: Expression;
+  property: Identifier;
+}
+
+export interface CallExpression extends Statement {
+  type: NodeType.CallExpression;
+  callee: Expression;
+  arguments: Expression[];
 }
 
 export interface ExpressionStatement extends Statement {
