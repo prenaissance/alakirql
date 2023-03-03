@@ -33,6 +33,20 @@ export const oneOf = <T>(...parsers: Parser<T>[]) => {
   });
 };
 
+export const except = <T>(parser: Parser<T>, ...parsers: Parser<T>[]) => {
+  return new Parser((state) => {
+    const states = parsers.map((parser) => parser.parserStateMapper(state));
+    const successState = states.find((state) => !state.isError);
+    return successState
+      ? {
+          ...state,
+          isError: true,
+          error: `Parser matched at index ${state.index}`,
+        }
+      : parser.parserStateMapper(state);
+  });
+};
+
 export const many = <T>(parser: Parser<T>) => {
   return new Parser<T[]>((state) => {
     const results: T[] = [];

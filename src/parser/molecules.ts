@@ -3,6 +3,7 @@ import P from "./lib";
 import { Parser } from "./lib/parser";
 import {
   ArrayExpression,
+  AssignmentExpression,
   BinaryExpression,
   BooleanLiteral,
   CallExpression,
@@ -26,7 +27,6 @@ import {
   additiveOperator,
   binaryOperatorTokens,
   comparisonOperator,
-  identifier,
   logicalOperator,
   multiplicativeOperator,
 } from "./lib/atoms";
@@ -89,8 +89,8 @@ export const leftToRightExpressionNode: Parser<Expression> = P.lazy(() =>
 
 export const expressionNode: Parser<Expression> = P.lazy(() =>
   P.oneOf<Expression>(
-    indexingExpressionNode,
     memberExpressionNode,
+    indexingExpressionNode,
     callExpressionNode,
     leftToRightExpressionNode,
   ),
@@ -230,26 +230,32 @@ export const callExpressionNode: Parser<CallExpression> =
       ) as Parser<CallExpression>,
   );
 
-const buildTree = (
-  end: Expression,
-  rest: Readonly<[Expression, BinaryOperatorTokenNode]>[],
-): BinaryExpression => {
-  if (rest.length === 0) {
-    return end as BinaryExpression;
-  }
-  const [left, { type: operator }] = rest[rest.length - 1];
+const buildTree =
+  <T = BinaryExpression>(nodeType: NodeType) =>
+  (
+    end: Expression,
+    rest: Readonly<[Expression, BinaryOperatorTokenNode]>[],
+  ): T => {
+    if (rest.length === 0) {
+      return end as T;
+    }
+    const [left, { type: operator }] = rest[rest.length - 1];
 
-  return {
-    type: NodeType.BinaryExpression,
-    operator,
-    left: buildTree(left, rest.slice(0, -1)),
-    right: end,
-  } as BinaryExpression;
-};
+    return {
+      type: nodeType,
+      operator,
+      left: buildTree(nodeType)(left, rest.slice(0, -1)),
+      right: end,
+    } as T;
+  };
 
 // recursive parser that makes an ast from binary expressions
 const binaryExpression =
-  (operator: Parser<BinaryOperatorTokenNode>) => (parser: Parser<Expression>) =>
+  (
+    operator: Parser<BinaryOperatorTokenNode>,
+    nodeType = NodeType.BinaryExpression,
+  ) =>
+  (parser: Parser<Expression>) =>
     parser.chain((start) =>
       (
         P.many1(
@@ -265,12 +271,12 @@ const binaryExpression =
           binaryOperatorTokens.includes(val?.type as any),
         ) as BinaryOperatorTokenNode[];
         const pairs = expressions.map((e, i) => [e, operators[i]] as const);
-        return buildTree(end, pairs);
+        return buildTree(nodeType)(end, pairs);
       }),
     );
 
 export const multiplicativeExpressionNode = binaryExpression(
-  multiplicativeOperator,
+  P.multiplicativeOperator,
 )(
   P.oneOf(
     P.betweenBrackets(leftToRightExpressionNode),
@@ -279,7 +285,7 @@ export const multiplicativeExpressionNode = binaryExpression(
 );
 
 export const additiveExpressionNode: Parser<BinaryExpression> =
-  binaryExpression(additiveOperator)(
+  binaryExpression(P.additiveOperator)(
     P.oneOf(
       P.betweenBrackets(leftToRightExpressionNode),
       multiplicativeExpressionNode,
@@ -287,7 +293,7 @@ export const additiveExpressionNode: Parser<BinaryExpression> =
     ),
   );
 
-export const comparisonExpressionNode = binaryExpression(comparisonOperator)(
+export const comparisonExpressionNode = binaryExpression(P.comparisonOperator)(
   P.oneOf(
     P.betweenBrackets(leftToRightExpressionNode),
     additiveExpressionNode,
@@ -296,7 +302,7 @@ export const comparisonExpressionNode = binaryExpression(comparisonOperator)(
   ),
 );
 
-export const logicalExpressionNode = binaryExpression(logicalOperator)(
+export const logicalExpressionNode = binaryExpression(P.logicalOperator)(
   P.oneOf(
     P.betweenBrackets(leftToRightExpressionNode),
     comparisonExpressionNode,
@@ -306,7 +312,43 @@ export const logicalExpressionNode = binaryExpression(logicalOperator)(
   ),
 );
 
-export const binaryExpressionNode = P.oneOf(
+export const assignmentExpressionNode = noPrecedenceExpressionNode.chain(
+  (first) =>
+    P.many1(
+      P.sequenceOf<BinaryOperatorTokenNode | Expression>(
+        P.assignmentOperator,
+        P.oneOf(
+          P.betweenBrackets(leftToRightExpressionNode),
+          logicalExpressionNode,
+          comparisonExpressionNode,
+          additiveExpressionNode,
+          multiplicativeExpressionNode,
+          noPrecedenceExpressionNode,
+        ),
+      ) as Parser<[BinaryOperatorTokenNode, Expression]>,
+    ).map((pairs) => {
+      const buildAssignmentTree = (
+        left: Expression,
+        rest: Readonly<[BinaryOperatorTokenNode, Expression]>[],
+      ): AssignmentExpression => {
+        if (rest.length === 0) {
+          return left as AssignmentExpression;
+        }
+        const [{ type: operator }, right] = rest[0];
+        return {
+          type: NodeType.AssignmentExpression,
+          operator,
+          left,
+          right: buildAssignmentTree(right, rest.slice(1)),
+        } as AssignmentExpression;
+      };
+
+      return buildAssignmentTree(first, pairs);
+    }),
+);
+
+export const binaryExpressionNode = P.oneOf<Expression>(
+  assignmentExpressionNode,
   logicalExpressionNode,
   comparisonExpressionNode,
   additiveExpressionNode,

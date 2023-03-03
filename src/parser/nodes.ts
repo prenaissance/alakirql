@@ -12,6 +12,7 @@ export enum NodeType {
   IndexingExpression = "IndexingExpression",
   MemberExpression = "MemberExpression",
   CallExpression = "CallExpression",
+  AssignmentExpression = "AssignmentExpression",
   ExpressionStatement = "ExpressionStatement",
   Identifier = "Identifier",
   Literal = "Literal",
@@ -45,7 +46,8 @@ export type Expression =
   | IndexingExpression
   | MemberExpression
   | CallExpression
-  | ObjectExpression;
+  | ObjectExpression
+  | AssignmentExpression;
 
 export interface NumericLiteral extends Statement {
   type: NodeType.Literal;
@@ -129,6 +131,13 @@ export interface Property extends Statement {
 export interface ObjectExpression extends Statement {
   type: NodeType.ObjectExpression;
   properties: Property[];
+}
+
+export interface AssignmentExpression extends Statement {
+  type: NodeType.AssignmentExpression;
+  left: Expression | AssignmentExpression;
+  right: Expression;
+  operator: TokenType.Assignment;
 }
 
 export interface ExpressionStatement extends Statement {

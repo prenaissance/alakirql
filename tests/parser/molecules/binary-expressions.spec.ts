@@ -182,4 +182,64 @@ describe("parser molecules -> binary expressions", () => {
       },
     });
   });
+
+  it("should parse single assignment expressions", () => {
+    const result = M.assignmentExpressionNode.run(lex("a = b[0] + 2"));
+    console.log(getValue(result));
+
+    expect(getValue(result)).toEqual({
+      type: NodeType.AssignmentExpression,
+      left: {
+        type: NodeType.Identifier,
+        name: "a",
+      },
+      operator: TokenType.Assignment,
+      right: {
+        type: NodeType.BinaryExpression,
+        operator: TokenType.Plus,
+        left: {
+          type: NodeType.IndexingExpression,
+          object: {
+            type: NodeType.Identifier,
+            name: "b",
+          },
+          index: {
+            type: NodeType.Literal,
+            kind: LiteralType.Number,
+            value: 0,
+          },
+        },
+        right: {
+          type: NodeType.Literal,
+          kind: LiteralType.Number,
+          value: 2,
+        },
+      },
+    });
+  });
+
+  it("should parse assignment expressions in order", () => {
+    const result = M.assignmentExpressionNode.run(lex("a = b = D2022-01-01"));
+    expect(getValue(result)).toEqual({
+      type: NodeType.AssignmentExpression,
+      left: {
+        type: NodeType.Identifier,
+        name: "a",
+      },
+      operator: TokenType.Assignment,
+      right: {
+        type: NodeType.AssignmentExpression,
+        left: {
+          type: NodeType.Identifier,
+          name: "b",
+        },
+        operator: TokenType.Assignment,
+        right: {
+          type: NodeType.Literal,
+          kind: LiteralType.Date,
+          value: new Date("2022-01-01"),
+        },
+      },
+    });
+  });
 });

@@ -89,6 +89,8 @@ export const binaryOperatorTokens = [
   TokenType.LessThanOrEqual,
   TokenType.GreaterThan,
   TokenType.GreaterThanOrEqual,
+  // priority 5 ?
+  TokenType.Assignment,
 ] as const;
 export type BinaryOperatorToken = (typeof binaryOperatorTokens)[number];
 export type BinaryOperatorTokenNode = TokenNode<BinaryOperatorToken>;
@@ -117,4 +119,8 @@ export const logicalOperator = oneOf(
   token(TokenType.And),
   token(TokenType.Or),
   token(TokenType.Not),
+) as Parser<BinaryOperatorTokenNode>;
+
+export const assignmentOperator = token(
+  TokenType.Assignment,
 ) as Parser<BinaryOperatorTokenNode>;
