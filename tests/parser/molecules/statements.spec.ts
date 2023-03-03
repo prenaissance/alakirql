@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import lex from "@/lexer";
 import * as M from "@/parser/molecules";
 import { LiteralType, NodeType } from "@/parser/nodes";
-import { TokenType } from "@/lexer/tokens";
 import { getValue } from "@/parser/lib/parser";
 
 describe("parser molecules -> statements", () => {
@@ -156,6 +155,31 @@ describe("parser molecules -> statements", () => {
           ],
         },
         alternate: null,
+      },
+    });
+  });
+
+  it("should parse while statements", () => {
+    const result = M.whileStatementNode.run(lex("while (true) { 1; }"));
+    expect(getValue(result)).toEqual({
+      type: NodeType.WhileStatement,
+      test: {
+        type: NodeType.Literal,
+        kind: LiteralType.Boolean,
+        value: true,
+      },
+      body: {
+        type: NodeType.BlockStatement,
+        body: [
+          {
+            type: NodeType.ExpressionStatement,
+            expression: {
+              type: NodeType.Literal,
+              kind: LiteralType.Number,
+              value: 1,
+            },
+          },
+        ],
       },
     });
   });

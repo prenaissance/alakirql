@@ -41,7 +41,7 @@ export interface Stmt {
 
 export interface Program extends Stmt {
   type: NodeType.Program;
-  body: Stmt[];
+  body: Statement[];
 }
 
 export type Expression =

@@ -7,6 +7,7 @@ export enum TokenType {
   Print = "Print",
   If = "If",
   Else = "Else",
+  While = "While",
 
   // data types
   Identifier = "Identifier",

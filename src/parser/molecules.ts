@@ -23,10 +23,10 @@ import {
   PrintStatement,
   Property,
   Statement,
-  Stmt,
   StringLiteral,
   VariableDeclaration,
   VariableDeclarator,
+  WhileStatement,
 } from "./nodes";
 import { BinaryOperatorTokenNode, binaryOperatorTokens } from "./lib/atoms";
 
@@ -91,11 +91,12 @@ export const expressionNode: Parser<Expression> = P.lazy(() =>
 
 export const statementNode: Parser<Statement> = P.lazy(() =>
   P.oneOf<Statement>(
+    whileStatementNode,
     ifStatementNode,
-    expressionStatementNode,
     variableDeclarationNode,
     blockStatementNode,
     printStatementNode,
+    expressionStatementNode,
   ),
 );
 
@@ -427,4 +428,19 @@ export const ifStatementNode: Parser<IfStatement> = (
       consequent,
       alternate: alternate ?? null,
     } as IfStatement),
+);
+
+export const whileStatementNode: Parser<WhileStatement> = (
+  P.sequenceOf<any>(
+    P.token(TokenType.While),
+    P.betweenBrackets(expressionNode),
+    statementNode,
+  ) as Parser<[never, Expression, Statement]>
+).map(
+  ([, test, body]) =>
+    ({
+      type: NodeType.WhileStatement,
+      test,
+      body,
+    } as WhileStatement),
 );
