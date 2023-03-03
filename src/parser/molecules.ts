@@ -9,6 +9,7 @@ import {
   CallExpression,
   DateLiteral,
   Expression,
+  ExpressionStatement,
   Identifier,
   IndexingExpression,
   Literal,
@@ -18,18 +19,12 @@ import {
   NumericLiteral,
   ObjectExpression,
   Property,
+  Statement,
   StringLiteral,
   VariableDeclaration,
   VariableDeclarator,
 } from "./nodes";
-import {
-  BinaryOperatorTokenNode,
-  additiveOperator,
-  binaryOperatorTokens,
-  comparisonOperator,
-  logicalOperator,
-  multiplicativeOperator,
-} from "./lib/atoms";
+import { BinaryOperatorTokenNode, binaryOperatorTokens } from "./lib/atoms";
 
 export const numericLiteralNode: Parser<NumericLiteral> = P.number.map(
   (value) => ({
@@ -90,6 +85,10 @@ export const expressionNode: Parser<Expression> = P.lazy(() =>
   P.oneOf<Expression>(binaryExpressionNode, noPrecedenceExpressionNode),
 );
 
+export const statementNode: Parser<Statement> = P.lazy(() =>
+  P.oneOf<Statement>(expressionStatementNode, variableDeclarationNode),
+);
+
 const valueVariableDeclaratorNode = P.sequenceOf<
   Identifier | Token | Expression
 >(
@@ -128,6 +127,7 @@ export const variableDeclarationNode = P.sequenceOf<
     variableDeclaratorNode,
     P.token(TokenType.Comma),
   ),
+  P.token(TokenType.Semicolon),
 ).map<VariableDeclaration>(([declarationToken, declarators]) => ({
   type: NodeType.VariableDeclaration,
   kind: (
@@ -370,3 +370,15 @@ export const binaryExpressionNode = P.oneOf<Expression>(
   additiveExpressionNode,
   multiplicativeExpressionNode,
 );
+
+export const expressionStatementNode: Parser<ExpressionStatement> =
+  P.sequenceOf<Expression | Token>(
+    expressionNode,
+    P.token(TokenType.Semicolon),
+  ).map(
+    ([expression]) =>
+      ({
+        type: NodeType.ExpressionStatement,
+        expression,
+      } as ExpressionStatement),
+  );

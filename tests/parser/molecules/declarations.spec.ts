@@ -7,9 +7,9 @@ import { getValue } from "@/parser/lib/parser";
 
 describe("parser molecules -> declarations", () => {
   it("should parse single uninitialized variable declarations", () => {
-    const result = M.variableDeclarationNode.run(lex("declare a"));
+    const result = M.variableDeclarationNode.run(lex("declare a;"));
     // this should error in the interpreter, but run in the parser
-    const result2 = M.variableDeclarationNode.run(lex("const a"));
+    const result2 = M.variableDeclarationNode.run(lex("const a ;"));
     expect(getValue(result)).toEqual({
       type: NodeType.VariableDeclaration,
       kind: TokenType.MutableDeclaration,
@@ -42,7 +42,7 @@ describe("parser molecules -> declarations", () => {
   });
 
   it("should parse single initialized variable declarations", () => {
-    const result = M.variableDeclarationNode.run(lex("declare a = 1"));
+    const result = M.variableDeclarationNode.run(lex("declare a = 1;"));
     expect(getValue(result)).toEqual({
       type: NodeType.VariableDeclaration,
       kind: TokenType.MutableDeclaration,
@@ -65,7 +65,7 @@ describe("parser molecules -> declarations", () => {
 
   it("should parse multiple variable declarations", () => {
     const result = M.variableDeclarationNode.run(
-      lex("declare a = 9, b, c = D2021-01-01"),
+      lex("declare a = 9, b, c = D2021-01-01;"),
     );
     expect(getValue(result)).toEqual({
       type: NodeType.VariableDeclaration,
