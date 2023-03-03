@@ -185,7 +185,6 @@ describe("parser molecules -> binary expressions", () => {
 
   it("should parse single assignment expressions", () => {
     const result = M.assignmentExpressionNode.run(lex("a = b[0] + 2"));
-    console.log(getValue(result));
 
     expect(getValue(result)).toEqual({
       type: NodeType.AssignmentExpression,

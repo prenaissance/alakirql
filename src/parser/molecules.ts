@@ -75,6 +75,9 @@ export const literalNode = P.oneOf<Literal>(
 
 const noPrecedenceExpressionNode: Parser<Expression> = P.lazy(() =>
   P.oneOf<Expression>(
+    callExpressionNode,
+    indexingExpressionNode,
+    memberExpressionNode,
     literalNode,
     identifierNode,
     arrayExpressionNode,
@@ -83,17 +86,8 @@ const noPrecedenceExpressionNode: Parser<Expression> = P.lazy(() =>
 );
 
 // TODO: Add support for unary expressions
-export const leftToRightExpressionNode: Parser<Expression> = P.lazy(() =>
-  P.oneOf<Expression>(binaryExpressionNode, noPrecedenceExpressionNode),
-);
-
 export const expressionNode: Parser<Expression> = P.lazy(() =>
-  P.oneOf<Expression>(
-    memberExpressionNode,
-    indexingExpressionNode,
-    callExpressionNode,
-    leftToRightExpressionNode,
-  ),
+  P.oneOf<Expression>(binaryExpressionNode, noPrecedenceExpressionNode),
 );
 
 const valueVariableDeclaratorNode = P.sequenceOf<
@@ -101,7 +95,7 @@ const valueVariableDeclaratorNode = P.sequenceOf<
 >(
   identifierNode,
   P.token(TokenType.Assignment),
-  leftToRightExpressionNode,
+  expressionNode,
 ).map<VariableDeclarator>(([identifier, , value]) => ({
   type: NodeType.VariableDeclarator,
   id: identifier as Identifier,
@@ -146,27 +140,11 @@ export const variableDeclarationNode = P.sequenceOf<
 
 export const arrayExpressionNode: Parser<ArrayExpression> =
   P.betweenSquareBrackets(
-    P.sepBy(leftToRightExpressionNode, P.token(TokenType.Comma)),
+    P.sepBy(expressionNode, P.token(TokenType.Comma)),
   ).map((elements) => ({
     type: NodeType.ArrayExpression,
     elements,
   }));
-
-export const indexingExpressionNode = leftToRightExpressionNode.chain(
-  (object) => {
-    return P.many1(P.betweenSquareBrackets(expressionNode)).map((indexes) => {
-      return indexes.reduce(
-        (node, index) =>
-          ({
-            type: NodeType.IndexingExpression,
-            object: node,
-            index,
-          } as IndexingExpression),
-        object,
-      );
-    });
-  },
-);
 
 export const objectExpressionNode: Parser<ObjectExpression> = P.lazy(() =>
   P.betweenCurlyBrackets(
@@ -193,7 +171,16 @@ export const objectExpressionNode: Parser<ObjectExpression> = P.lazy(() =>
   ),
 );
 
-export const memberExpressionNode = leftToRightExpressionNode.chain((object) =>
+const memberAccessible = P.lazy(() =>
+  P.oneOf<Expression>(
+    literalNode,
+    identifierNode,
+    arrayExpressionNode,
+    objectExpressionNode,
+  ),
+);
+
+export const memberExpressionNode = memberAccessible.chain((object) =>
   P.many1(
     P.sequenceOf<any>(P.token(TokenType.Dot), identifierNode) as Parser<
       [TokenNode<TokenType.Dot>, Identifier]
@@ -213,22 +200,56 @@ export const memberExpressionNode = leftToRightExpressionNode.chain((object) =>
   ),
 );
 
-export const callExpressionNode: Parser<CallExpression> =
-  leftToRightExpressionNode.chain(
-    (callee) =>
-      P.many(
-        P.betweenBrackets(P.sepBy(expressionNode, P.token(TokenType.Comma))),
-      ).map<CallExpression>((args) =>
-        args.reduce(
-          (node, args) => ({
-            type: NodeType.CallExpression,
-            callee: node,
-            arguments: args,
-          }),
-          callee as unknown as CallExpression,
-        ),
-      ) as Parser<CallExpression>,
-  );
+const callable = P.lazy(() =>
+  P.oneOf<Expression>(
+    memberExpressionNode,
+    indexingExpressionNode,
+    literalNode,
+    identifierNode,
+    arrayExpressionNode,
+    objectExpressionNode,
+  ),
+);
+
+export const callExpressionNode: Parser<CallExpression> = callable.chain(
+  (callee) =>
+    P.many(
+      P.betweenBrackets(P.sepBy(expressionNode, P.token(TokenType.Comma))),
+    ).map<CallExpression>((args) =>
+      args.reduce(
+        (node, args) => ({
+          type: NodeType.CallExpression,
+          callee: node,
+          arguments: args,
+        }),
+        callee as unknown as CallExpression,
+      ),
+    ) as Parser<CallExpression>,
+);
+
+const indexable: Parser<Expression> = P.lazy(() =>
+  P.oneOf<Expression>(
+    memberExpressionNode,
+    literalNode,
+    identifierNode,
+    arrayExpressionNode,
+    objectExpressionNode,
+  ),
+);
+
+export const indexingExpressionNode = indexable.chain((object) => {
+  return P.many1(P.betweenSquareBrackets(expressionNode)).map((indexes) => {
+    return indexes.reduce(
+      (node, index) =>
+        ({
+          type: NodeType.IndexingExpression,
+          object: node,
+          index,
+        } as IndexingExpression),
+      object,
+    );
+  });
+});
 
 const buildTree =
   <T = BinaryExpression>(nodeType: NodeType) =>
@@ -277,17 +298,12 @@ const binaryExpression =
 
 export const multiplicativeExpressionNode = binaryExpression(
   P.multiplicativeOperator,
-)(
-  P.oneOf(
-    P.betweenBrackets(leftToRightExpressionNode),
-    noPrecedenceExpressionNode,
-  ),
-);
+)(P.oneOf(P.betweenBrackets(expressionNode), noPrecedenceExpressionNode));
 
 export const additiveExpressionNode: Parser<BinaryExpression> =
   binaryExpression(P.additiveOperator)(
     P.oneOf(
-      P.betweenBrackets(leftToRightExpressionNode),
+      P.betweenBrackets(expressionNode),
       multiplicativeExpressionNode,
       noPrecedenceExpressionNode,
     ),
@@ -295,7 +311,7 @@ export const additiveExpressionNode: Parser<BinaryExpression> =
 
 export const comparisonExpressionNode = binaryExpression(P.comparisonOperator)(
   P.oneOf(
-    P.betweenBrackets(leftToRightExpressionNode),
+    P.betweenBrackets(expressionNode),
     additiveExpressionNode,
     multiplicativeExpressionNode,
     noPrecedenceExpressionNode,
@@ -304,7 +320,7 @@ export const comparisonExpressionNode = binaryExpression(P.comparisonOperator)(
 
 export const logicalExpressionNode = binaryExpression(P.logicalOperator)(
   P.oneOf(
-    P.betweenBrackets(leftToRightExpressionNode),
+    P.betweenBrackets(expressionNode),
     comparisonExpressionNode,
     additiveExpressionNode,
     multiplicativeExpressionNode,
@@ -318,7 +334,7 @@ export const assignmentExpressionNode = noPrecedenceExpressionNode.chain(
       P.sequenceOf<BinaryOperatorTokenNode | Expression>(
         P.assignmentOperator,
         P.oneOf(
-          P.betweenBrackets(leftToRightExpressionNode),
+          P.betweenBrackets(expressionNode),
           logicalExpressionNode,
           comparisonExpressionNode,
           additiveExpressionNode,
