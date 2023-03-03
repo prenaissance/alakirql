@@ -5,6 +5,12 @@ import { TokenType } from "../src/lexer/tokens";
 import { LexingError } from "../src/lexer/errors";
 
 describe("lexer", () => {
+  it("should lex nothing", () => {
+    const expression = "";
+    const expectedTokens: any[] = [];
+    const tokens = lex(expression);
+    expect(tokens).toEqual(expectedTokens);
+  });
   it("should lex mathematical expressions", () => {
     const expression = "1 + 2 * 3 - 4 / 5";
     const expectedTokens = [
@@ -304,5 +310,46 @@ describe("lexer", () => {
   it("should throw error on invalid identifier", () => {
     const expression = "const as&b = 1";
     expect(() => lex(expression)).toThrowError(new LexingError("&b", 8));
+  });
+
+  it("should lex property accessors", () => {
+    const expression = "a.b.c";
+    const expectedTokens = [
+      {
+        type: TokenType.Identifier,
+        value: "a",
+        meta: {
+          index: 0,
+        },
+      },
+      {
+        type: TokenType.Dot,
+        meta: {
+          index: 1,
+        },
+      },
+      {
+        type: TokenType.Identifier,
+        value: "b",
+        meta: {
+          index: 2,
+        },
+      },
+      {
+        type: TokenType.Dot,
+        meta: {
+          index: 3,
+        },
+      },
+      {
+        type: TokenType.Identifier,
+        value: "c",
+        meta: {
+          index: 4,
+        },
+      },
+    ];
+    const tokens = lex(expression);
+    expect(tokens).toEqual(expectedTokens);
   });
 });

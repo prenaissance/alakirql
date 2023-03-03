@@ -9,6 +9,7 @@ export const keywordMap = new Map<string, TokenType>([
   ["print", TokenType.Print],
   ["if", TokenType.If],
   ["else", TokenType.Else],
+  ["while", TokenType.While],
 ]);
 
 export const symbolMap = new Map<string, TokenType>([
@@ -22,6 +23,7 @@ export const symbolMap = new Map<string, TokenType>([
   ["(", TokenType.OpenBracket],
   [")", TokenType.CloseBracket],
   [",", TokenType.Comma],
+  [".", TokenType.Dot],
   ["=", TokenType.Assignment],
   ["+", TokenType.Plus],
   ["-", TokenType.Minus],
