@@ -186,7 +186,7 @@ export interface IfStatement extends Stmt {
   type: NodeType.IfStatement;
   test: Expression;
   consequent: Statement;
-  alternate: Statement;
+  alternate: Statement | null;
 }
 
 export interface WhileStatement extends Stmt {

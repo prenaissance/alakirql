@@ -12,6 +12,7 @@ import {
   Expression,
   ExpressionStatement,
   Identifier,
+  IfStatement,
   IndexingExpression,
   Literal,
   LiteralType,
@@ -90,6 +91,7 @@ export const expressionNode: Parser<Expression> = P.lazy(() =>
 
 export const statementNode: Parser<Statement> = P.lazy(() =>
   P.oneOf<Statement>(
+    ifStatementNode,
     expressionStatementNode,
     variableDeclarationNode,
     blockStatementNode,
@@ -404,3 +406,25 @@ export const blockStatementNode: Parser<BlockStatement> =
     type: NodeType.BlockStatement,
     body,
   }));
+
+export const ifStatementNode: Parser<IfStatement> = (
+  P.sequenceOf<any>(
+    P.token(TokenType.If),
+    P.betweenBrackets(expressionNode),
+    statementNode,
+    P.optional(
+      P.sequenceOf<Token | Statement>(
+        P.token(TokenType.Else),
+        statementNode,
+      ).map(([, statement]) => statement) as Parser<Statement>,
+    ),
+  ) as Parser<[never, Expression, Statement, Statement | undefined]>
+).map(
+  ([, test, consequent, alternate]) =>
+    ({
+      type: NodeType.IfStatement,
+      test,
+      consequent,
+      alternate: alternate ?? null,
+    } as IfStatement),
+);
