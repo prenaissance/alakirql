@@ -52,6 +52,19 @@ describe("parser combinatorics", () => {
     expect(plusResult.index).toBe(1);
   });
 
+  it("should parse optional tokens at the end of input", () => {
+    const optionalNumberParser = P.optional(P.token(TokenType.Number));
+    const plusParser = P.token(TokenType.Plus);
+    const parser = P.sequenceOf(plusParser, optionalNumberParser);
+    const onePlusResult = parser.run(lex("+ 1"));
+    expect(onePlusResult.isError).toBe(false);
+    expect(onePlusResult.index).toBe(2);
+
+    const plusResult = parser.run(lex("+"));
+    expect(plusResult.isError).toBe(false);
+    expect(plusResult.index).toBe(1);
+  });
+
   it("should parse exactly 1 token with 'many'", () => {
     const parser = P.many(P.token(TokenType.Number));
     const result = parser.run(lex("123"));

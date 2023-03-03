@@ -78,6 +78,8 @@ export const optional = <T>(parser: Parser<T>) => {
       ? {
           ...state,
           result: null,
+          isError: false,
+          error: undefined,
         }
       : result;
   });
