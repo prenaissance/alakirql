@@ -12,6 +12,9 @@ if (!file) {
 async function main() {
   const fileText = await fs.readFile(file, "utf-8");
   const tokens = lex(fileText);
-  console.log(tokens);
+  console.table(
+    // @ts-ignore
+    tokens.map(({ type, value, meta: { index } }) => ({ type, value, index })),
+  );
 }
 main();
