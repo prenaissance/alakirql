@@ -5,6 +5,7 @@ import {
   ArrayExpression,
   AssignmentExpression,
   BinaryExpression,
+  BlockStatement,
   BooleanLiteral,
   CallExpression,
   DateLiteral,
@@ -18,8 +19,10 @@ import {
   NodeType,
   NumericLiteral,
   ObjectExpression,
+  PrintStatement,
   Property,
   Statement,
+  Stmt,
   StringLiteral,
   VariableDeclaration,
   VariableDeclarator,
@@ -86,7 +89,12 @@ export const expressionNode: Parser<Expression> = P.lazy(() =>
 );
 
 export const statementNode: Parser<Statement> = P.lazy(() =>
-  P.oneOf<Statement>(expressionStatementNode, variableDeclarationNode),
+  P.oneOf<Statement>(
+    expressionStatementNode,
+    variableDeclarationNode,
+    blockStatementNode,
+    printStatementNode,
+  ),
 );
 
 const valueVariableDeclaratorNode = P.sequenceOf<
@@ -382,3 +390,17 @@ export const expressionStatementNode: Parser<ExpressionStatement> =
         expression,
       } as ExpressionStatement),
   );
+
+export const printStatementNode: Parser<PrintStatement> = P.between(
+  P.token(TokenType.Print),
+  P.token(TokenType.Semicolon),
+)(expressionNode).map((expression) => ({
+  type: NodeType.PrintStatement,
+  expression,
+}));
+
+export const blockStatementNode: Parser<BlockStatement> =
+  P.betweenCurlyBrackets(P.many(statementNode)).map((body) => ({
+    type: NodeType.BlockStatement,
+    body,
+  }));
