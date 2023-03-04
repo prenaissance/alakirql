@@ -1,6 +1,7 @@
 # Alakirql - DSL for Astrology
 
 ![ci status](https://github.com/prenaissance/alakirql/actions/workflows/ci.yml/badge.svg)
+[![codecov](https://codecov.io/gh/prenaissance/alakirql/branch/master/graph/badge.svg?token=OYGG9ZKOAF)](https://codecov.io/gh/prenaissance/alakirql)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org)
 
 ## Running locally
@@ -32,15 +33,31 @@ This package is going to contain just the library for the parser and probably th
 
 ### Completed
 
-Lexer (Add more keywords and symbols if you want)
+- Lexer (Add more keywords and symbols if you want)
 
-### Coming soon
+### In progress
 
 - Parser
 
-### Planned
+  - [x] Basic keywords
+  - [x] Declarations & assignments
+  - [x] Binary expressions
+  - [x] Expressions
+  - [x] Function calls
+  - [x] Control flow
+  - [x] Ast generation
+  - [ ] Function definitions
+
+- Cli (some demo scripts are in the parser 'demo' folder)
+
+  - [ ] Read from file
+  - [ ] Repl
+  - [ ] Lex
+  - [ ] Parse
+  - [ ] Interpret
 
 - Interpreter / Transpiler
-- Block scoped variables
-- Predefined functions
-- Control flow
+  - [ ] Assignments and declarations
+  - [ ] Block scoped variables
+  - [ ] Predefined functions
+  - [ ] Control flow
