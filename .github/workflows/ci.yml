@@ -105,4 +105,25 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Test
-        run: pnpm run test
+        run: pnpm run test:coverage
+
+      - name: Upload test coverage artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-coverage
+          path: ./coverage
+
+  coverage:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: test-coverage
+          path: ./coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
