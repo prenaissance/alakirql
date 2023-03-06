@@ -1,0 +1,25 @@
+{
+    "$schema": "https://turbo.build/schema.json",
+    "pipeline": {
+        "build": {
+            "outputs": [
+                "dist"
+            ]
+        },
+        "test": {
+            "inputs": [
+                "src/**/*.ts",
+                "tests/**/*spec.ts"
+            ]
+        },
+        "test:coverage": {
+            "inputs": [
+                "src/**/*.ts",
+                "tests/**/*spec.ts"
+            ],
+            "outputs": [
+                "coverage"
+            ]
+        }
+    }
+}

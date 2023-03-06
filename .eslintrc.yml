@@ -27,5 +27,8 @@ settings:
   "import/parsers": 
     "@typescript-eslint/parser": [".ts", ".tsx"]
   "import/resolver":
-    typescript: {}
-      
+    typescript: {
+      project: ["./tsconfig.json", "packages/*/tsconfig.json"]
+    }
+root: true
+ignorePatterns: ["node_modules/", "dist/", "packages/*/dist/", "packages/*/node_modules/"]

@@ -1,5 +1,6 @@
-const x = 12;
-declare y;
+declare arr = [
+    4, 5
+];
 
 if (x > 10) {
     y = "Greater";

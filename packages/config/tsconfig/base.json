@@ -15,20 +15,6 @@
     "noImplicitReturns": true,
     "skipLibCheck": true,
     "declaration": true,
-    "baseUrl": "./",
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    },
     "outDir": "dist"
-  },
-  "include": [
-    "**/*.d.ts",
-    "src",
-    "tests"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  }
 }

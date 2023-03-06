@@ -1,49 +1,27 @@
 {
-  "name": "alakirql",
-  "type": "module",
-  "version": "1.0.0",
   "private": true,
-  "description": "DSL for astrology",
-  "files": [
-    "dist"
-  ],
+  "name": "alakirql",
+  "version": "1.0.0",
+  "description": "monorepo for alakirql packages",
   "scripts": {
-    "build": "rimraf dist && swc -d dist src && resolve-tspaths",
-    "test": "vitest run",
-    "test:watch": "vitest watch",
-    "test:coverage": "vitest run --coverage",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "test:coverage": "turbo run test:coverage",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx ."
   },
-  "keywords": [
-    "dsl",
-    "astrology",
-    "lexer",
-    "parser",
-    "interpreter"
-  ],
-  "author": "prenaissance",
+  "keywords": [],
+  "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@swc/cli": "^0.1.62",
-    "@swc/core": "^1.3.36",
+    "@types/node": "^18.14.2",
     "@typescript-eslint/eslint-plugin": "^5.54.0",
     "@typescript-eslint/parser": "^5.54.0",
-    "@vitest/coverage-c8": "^0.29.1",
     "eslint": "^8.35.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-import-resolver-typescript": "^3.5.3",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.8.4",
-    "resolve-tspaths": "^0.8.8",
-    "rimraf": "^4.1.2",
-    "typescript": "^4.9.5",
-    "vite": "^4.1.4",
-    "vite-tsconfig-paths": "^4.0.5",
-    "vitest": "^0.29.1"
-  },
-  "dependencies": {
-    "-": "^0.0.1",
-    "@types/node": "^18.14.2"
+    "typescript": "^4.9.5"
   }
 }
