@@ -5,6 +5,7 @@
   "description": "monorepo for alakirql packages",
   "scripts": {
     "build": "turbo run build",
+    "build:watch": "turbo run build:watch",
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx ."
