@@ -4,7 +4,7 @@ import { Argument, Command } from "commander";
 import figlet from "figlet";
 import gradient from "gradient-string";
 // ? For some reason it fails on the pipeline only, find the reason later
-// eslint-disable-next-line @import/no-unresolved
+// eslint-disable-next-line import/no-unresolved
 import { lex, parse } from "@alakir/core";
 
 import { version } from "../package.json";
