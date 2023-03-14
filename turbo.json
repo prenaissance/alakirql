@@ -2,41 +2,39 @@
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "build": {
-      "outputs": [
-        "dist"
-      ]
-    },
-    "build-types": {
-      "inputs": [
-        "src/**/*.ts"
-      ],
-      "outputs": [
-        "dist"
-      ],
       "dependsOn": [
-        "build"
+        "^build"
+      ],
+      "outputs": [
+        "dist/**"
       ]
     },
     "build:watch": {
       "outputs": [
-        "dist"
+        "dist/**"
       ],
       "cache": false,
       "persistent": true
     },
     "test": {
+      "dependsOn": [
+        "build"
+      ],
       "inputs": [
         "src/**/*.ts",
         "tests/**/*spec.ts"
       ]
     },
     "test:coverage": {
+      "dependsOn": [
+        "build"
+      ],
       "inputs": [
         "src/**/*.ts",
         "tests/**/*spec.ts"
       ],
       "outputs": [
-        "coverage"
+        "coverage/**"
       ]
     }
   }
