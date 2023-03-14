@@ -51,9 +51,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: build
-          path: |
-            "!node_modules/**/dist"
-            "**/dist"
+          path: "packages/*/dist"
 
   lint:
     runs-on: ubuntu-latest
@@ -121,7 +119,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: test-coverage
-          path: "**/coverage"
+          path: "packages/*/coverage"
 
   coverage:
     needs: test
@@ -133,7 +131,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: test-coverage
-          path: "**./coverage"
+          path: "."
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
