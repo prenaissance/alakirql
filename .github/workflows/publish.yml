@@ -1,0 +1,29 @@
+name: Publish packages
+
+on:
+  release:
+    types: [published]
+
+env:
+  NODE_VERSION : 16.x
+  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Install Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          run_install: false
+          version: 7
+      - name: Publish packages
+        run: pnpm publish --recursive

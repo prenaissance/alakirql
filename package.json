@@ -11,6 +11,9 @@
     "lint": "eslint --ext .ts,.tsx,.js,.jsx ."
   },
   "keywords": [],
+  "publishConfig": {
+    "access": "public"
+  },
   "author": "",
   "license": "ISC",
   "devDependencies": {
