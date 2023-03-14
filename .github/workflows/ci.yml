@@ -51,7 +51,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: build
-          path: "**/dist"
+          path: |
+            "!node_modules/**/dist"
+            "**/dist"
 
   lint:
     runs-on: ubuntu-latest
