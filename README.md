@@ -1,8 +1,24 @@
 # Alakirql - DSL for Astrology
 
-![ci status](https://github.com/prenaissance/alakirql/actions/workflows/ci.yml/badge.svg)
-[![codecov](https://codecov.io/gh/prenaissance/alakirql/branch/master/graph/badge.svg?token=OYGG9ZKOAF)](https://codecov.io/gh/prenaissance/alakirql)
-[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org)
+<p align="center">
+  <img alt="ci workflow" src="https://github.com/prenaissance/alakirql/actions/workflows/ci.yml/badge.svg"/>
+  <img alt="publish workflow" src="https://github.com/prenaissance/alakirql/actions/workflows/publish.yml/badge.svg"/>
+  <a href="https://codecov.io/gh/prenaissance/alakirql" target="_blank">
+    <img alt="codecov" src="https://codecov.io/gh/prenaissance/alakirql/branch/master/graph/badge.svg?token=OYGG9ZKOAF">
+  </a>
+  <a href="https://conventionalcommits.org" target="_blank">
+    <img alt="conventional commits" src="https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/@alakir/core">
+    <img alt="npm" src="https://img.shields.io/npm/v/@alakir/core?label=%40alakir%2Fcore">
+  </a>
+  <a href="https://www.npmjs.com/package/@alakir/cli">
+    <img alt="npm" src="https://img.shields.io/npm/v/@alakir/cli?label=%40alakir%2Fcli">
+  </a>
+</p>
 
 This is a monorepo managed by [Turborepo](https://turbo.build/repo), having the following published packages:
 
