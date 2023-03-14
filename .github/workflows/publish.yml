@@ -7,6 +7,8 @@ on:
 env:
   NODE_VERSION : 16.x
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: prenaissance
 
 jobs:
   publish:
@@ -23,12 +25,9 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          run_install: false
+          run_install: true
           version: 7
-      - name: Download build artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: build
-          path: .
+      - name: Build
+        run: pnpm run build
       - name: Publish packages
-        run: pnpm publish --recursive
+        run: pnpm publish --recursive --no-git-checks
