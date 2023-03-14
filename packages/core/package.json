@@ -12,6 +12,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "build": "tsup src --dts --format esm,cjs --external config --clean",
+    "build:watch": "pnpm run build --watch",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage"

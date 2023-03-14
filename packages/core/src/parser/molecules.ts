@@ -91,12 +91,12 @@ export const expressionNode: Parser<Expression> = P.lazy(() =>
 
 export const statementNode: Parser<Statement> = P.lazy(() =>
   P.oneOf<Statement>(
+    variableDeclarationNode,
+    expressionStatementNode,
     whileStatementNode,
     ifStatementNode,
-    variableDeclarationNode,
-    blockStatementNode,
     printStatementNode,
-    expressionStatementNode,
+    blockStatementNode,
   ),
 );
 
