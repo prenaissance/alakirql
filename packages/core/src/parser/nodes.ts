@@ -91,8 +91,7 @@ export type Literal =
   | NumericLiteral
   | StringLiteral
   | BooleanLiteral
-  | DateLiteral
-  | null;
+  | DateLiteral;
 
 export interface ArrayExpression extends Stmt {
   type: NodeType.ArrayExpression;
@@ -168,7 +167,7 @@ export interface ExpressionStatement extends Stmt {
 export interface VariableDeclarator extends Stmt {
   type: NodeType.VariableDeclarator;
   id: Identifier;
-  init: Expression;
+  init: Expression | null;
 }
 
 export interface VariableDeclaration extends Stmt {
