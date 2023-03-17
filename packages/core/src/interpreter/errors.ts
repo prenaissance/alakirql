@@ -9,10 +9,6 @@ export class ImmutableError extends Error {
       case SymbolModifier.Predefined:
         super(`Cannot reassign predefined symbol "${symbol.symbol.type}"`);
         break;
-      default:
-        super(
-          "Mutable symbol should be re-assignable, but for some reason an error was thrown :skull_emoji:",
-        );
     }
   }
 }

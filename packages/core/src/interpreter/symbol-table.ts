@@ -1,4 +1,3 @@
-import { NodeType, VariableDeclaration } from "@/parser/nodes";
 import {
   AlreadyDeclaredError,
   ImmutableError,
@@ -67,7 +66,10 @@ export class ContextStack {
   getSymbol(name: string): InnerSymbol | null {
     const stack = this.stack.find((ctx) => ctx.has(name)) ?? this.globalContext;
     const symbol = stack.get(name);
-    return symbol?.symbol ?? null;
+    if (!symbol) {
+      throw new NotDeclaredError(name);
+    }
+    return symbol.symbol;
   }
 
   private setSymbol(name: string, value: SymbolValue): void {
