@@ -50,16 +50,6 @@ export const betweenBrackets = between(
   token(TokenType.CloseBracket),
 );
 
-// TODO: broken. Should use recursive chain instead
-export const betweenManyBrackets: <T>(parser: Parser<T>) => Parser<T> = (
-  parser,
-) =>
-  lazy(() =>
-    oneOf(parser, betweenBrackets(parser), betweenManyBrackets(parser)),
-  );
-export const betweenMany1Brackets: <T>(parser: Parser<T>) => Parser<T> = (
-  parser,
-) => lazy(() => oneOf(betweenBrackets(parser), betweenMany1Brackets(parser)));
 export const betweenSquareBrackets = between(
   token(TokenType.OpenSquareBracket),
   token(TokenType.CloseSquareBracket),
