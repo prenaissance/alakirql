@@ -1,14 +1,14 @@
 {
   "private": true,
   "name": "alakirql",
-  "version": "1.0.0",
   "description": "monorepo for alakirql packages",
   "scripts": {
     "build": "turbo run build",
     "build:watch": "turbo run build:watch",
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage",
-    "lint": "eslint --ext .ts,.tsx,.js,.jsx ."
+    "lint": "eslint --ext .ts,.tsx,.js,.jsx .",
+    "publish": "turbo run build && pnpm publish -r --access public --no-git-checks"
   },
   "keywords": [],
   "publishConfig": {

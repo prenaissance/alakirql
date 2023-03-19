@@ -27,7 +27,9 @@ jobs:
         with:
           run_install: true
           version: 7
+      - name: Create .npmrc
+        run: echo "//registry.npmjs.org/:_authToken=${{ env.NODE_AUTH_TOKEN }}" > .npmrc
       - name: Build
         run: pnpm run build
       - name: Publish packages
-        run: pnpm publish --recursive --access public --no-git-checks
+        run: pnpm run publish
