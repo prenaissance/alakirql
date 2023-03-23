@@ -32,6 +32,8 @@ export class Interpreter {
     [NodeType.AssignmentExpression]: this.handleAssignment,
     [NodeType.PrintStatement]: this.handlePrint,
     [NodeType.Program]: this.handleProgram,
+    [NodeType.Identifier]: this.handleIdentifier,
+    [NodeType.ExpressionStatement]: this.handleExpressionStatement,
   };
   interpret(program: string) {
     const ast = parse(program);
@@ -48,12 +50,16 @@ export class Interpreter {
 
   handleStatement(node: Statement) {
     // @ts-ignore
-    return this.tokenHandlerMap[node.type](node);
+    return this.tokenHandlerMap[node.type].call(this, node);
   }
 
   handleExpression(node: Expression): InnerSymbol {
     // @ts-ignore
-    return this.tokenHandlerMap[node.type](node);
+    return this.tokenHandlerMap[node.type].call(this, node);
+  }
+
+  handleExpressionStatement(node: ExpressionStatement) {
+    this.handleExpression(node.expression);
   }
 
   handlePrint(node: PrintStatement): void {
@@ -77,10 +83,18 @@ export class Interpreter {
   }
 
   handleAssignment(node: AssignmentExpression) {
-    const left = this.handleExpression(node.left);
-    const right = this.handleExpression(node.right);
-    left.type = right.type;
-    left.value = right.value;
+    if (node.left.type !== NodeType.Identifier) {
+      const left = this.handleExpression(node.left);
+      const right = this.handleExpression(node.right);
+      left.type = right.type;
+      left.value = right.value;
+      return left;
+    }
+
+    const { left, right } = node;
+    const value = this.handleExpression(right);
+    this.context.setMutableSymbol(left.name, value);
+    return value;
   }
 
   handleIdentifier(node: Identifier) {
@@ -92,7 +106,6 @@ export class Interpreter {
   }
 
   handleVariableDeclaration(node: VariableDeclaration) {
-    const { handleExpression, context } = this;
     const { declarations, kind } = node;
     const modifier =
       kind === TokenType.ImmutableDeclaration
@@ -101,17 +114,13 @@ export class Interpreter {
     declarations.forEach((declaration) => {
       const { id, init } = declaration;
       const value = init
-        ? handleExpression(init)
+        ? this.handleExpression(init)
         : ({ type: SymbolType.Null, value: null } as InnerSymbol);
-      context.declareSymbol(id.name, value, modifier);
+      this.context.declareSymbol(id.name, value, modifier);
     });
   }
 
   handleArrayExpression(node: ArrayExpression) {
-    return null;
-  }
-
-  handleExpressionStatement(node: ExpressionStatement) {
     return null;
   }
 }
