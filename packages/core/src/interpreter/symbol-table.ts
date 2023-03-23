@@ -18,7 +18,23 @@ export enum SymbolType {
   Function = "Function",
   Array = "Array",
   Object = "Object",
+  Null = "Null",
 }
+
+type UninitializedSymbol = {
+  type: SymbolType.Null;
+  value: null;
+};
+
+type ArraySymbol = {
+  type: SymbolType.Array;
+  value: InnerSymbol[];
+};
+
+type ObjectSymbol = {
+  type: SymbolType.Object;
+  value: Record<string, InnerSymbol>;
+};
 
 type StringSymbol = {
   type: SymbolType.String;
@@ -46,11 +62,14 @@ type FunctionSymbol = {
 };
 
 export type InnerSymbol =
+  | UninitializedSymbol
   | StringSymbol
   | NumberSymbol
   | BooleanSymbol
   | DateSymbol
-  | FunctionSymbol;
+  | FunctionSymbol
+  | ArraySymbol
+  | ObjectSymbol;
 
 export type SymbolValue = {
   modifier: SymbolModifier;
