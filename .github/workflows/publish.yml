@@ -5,7 +5,7 @@ on:
     types: [published]
 
 env:
-  NODE_VERSION : 16.x
+  NODE_VERSION: 16.x
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
   TURBO_TEAM: prenaissance
@@ -21,7 +21,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
@@ -32,4 +32,4 @@ jobs:
       - name: Build
         run: pnpm run build
       - name: Publish packages
-        run: pnpm run publish
+        run: pnpm -w run publish
