@@ -1,6 +1,6 @@
 import { Token, TokenNode, TokenType, TokenValueNode } from "@/lexer/tokens";
 import { Parser } from "./parser";
-import { between, lazy, oneOf } from "./combinations";
+import { between, oneOf } from "./combinations";
 
 export const token = (token: TokenType) => {
   return new Parser<Token>((state) => {

@@ -1,8 +1,8 @@
 export class IO {
-  readonly outputs: string[] = [];
-  private readonly subscribers = new Set<(output: string) => void>();
+  readonly outputs: any[] = [];
+  private readonly subscribers = new Set<(output: any) => void>();
 
-  subscribe(subscriber: (output: string) => void) {
+  subscribe(subscriber: (output: any) => void) {
     this.subscribers.add(subscriber);
 
     return () => {
@@ -12,6 +12,11 @@ export class IO {
 
   print(message: string): void {
     this.outputs.push(message);
+    this.subscribers.forEach((subscriber) => subscriber(message));
+  }
+
+  // to be used to notify of statements that don't print anything
+  advance(message: any): void {
     this.subscribers.forEach((subscriber) => subscriber(message));
   }
 }

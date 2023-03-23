@@ -1,11 +1,12 @@
 #! /usr/bin/env node
 import fs from "node:fs/promises";
+import repl from "node:repl";
 import { Argument, Command } from "commander";
 import figlet from "figlet";
 import gradient from "gradient-string";
 // ? For some reason it fails on the pipeline only, find the reason later
 // eslint-disable-next-line import/no-unresolved
-import { lex, parse } from "@alakir/core";
+import { lex, parse, Interpreter, interpret } from "@alakir/core";
 
 import { version } from "../package.json";
 import chalk from "chalk";
@@ -50,14 +51,29 @@ program
   .addArgument(sourceArgument)
   .option("-f, --file <file>", "input file")
   .option("-o, --output <file>", "output file")
-  .action((source: string | undefined, options: Options) => {
+  .action(async (source: string | undefined, options: Options) => {
     const { file } = options;
     if (!source && !file) {
-      console.log("repl not implemented yet");
+      const interpreter = new Interpreter();
+      repl.start({
+        prompt: gradient.passion("alakir> "),
+        eval: (cmd, context, filename, callback) => {
+          const unsubscribe = interpreter.io.subscribe((message: any) => {
+            callback(null, message);
+          });
+          try {
+            interpreter.interpret(cmd);
+          } catch (e) {
+            callback(e as Error, "");
+          } finally {
+            unsubscribe();
+          }
+        },
+      });
       return;
     }
-
-    console.log("interpreter not implemented yet");
+    const input = await getInput(source, { file });
+    interpret(input);
   });
 
 program
@@ -65,6 +81,20 @@ program
   .addArgument(sourceArgument)
   .action(async (source) => {
     const { file, output } = program.opts<Options>();
+    if (!source && !file) {
+      repl.start({
+        prompt: gradient.passion("alakir> "),
+        eval: (cmd, context, filename, callback) => {
+          try {
+            const result = lex(cmd);
+            callback(null, result);
+          } catch (e) {
+            callback(e as Error, "");
+          }
+        },
+      });
+      return;
+    }
     const input = await getInput(source, { file });
     try {
       const result = lex(input);
@@ -79,6 +109,20 @@ program
   .addArgument(sourceArgument)
   .action(async (source) => {
     const { file, output } = program.opts<Options>();
+    if (!source && !file) {
+      repl.start({
+        prompt: gradient.passion("alakir> "),
+        eval: (cmd, context, filename, callback) => {
+          const result = parse(cmd);
+          if (result.isError) {
+            callback(null, chalk.red(result.error));
+          } else {
+            callback(null, JSON.stringify(result.result, null, 2));
+          }
+        },
+      });
+      return;
+    }
     const input = await getInput(source, { file });
     const result = parse(input);
     const outputString = result.isError

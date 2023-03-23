@@ -45,7 +45,12 @@ export class Interpreter {
   }
 
   handleProgram(node: Program) {
-    node.body.forEach((statement) => this.handleStatement(statement));
+    node.body.forEach((statement) => {
+      const result = this.handleStatement(statement);
+      if (statement.type !== NodeType.PrintStatement) {
+        this.io.advance(result);
+      }
+    });
   }
 
   handleStatement(node: Statement) {
@@ -59,7 +64,7 @@ export class Interpreter {
   }
 
   handleExpressionStatement(node: ExpressionStatement) {
-    this.handleExpression(node.expression);
+    return this.handleExpression(node.expression).value;
   }
 
   handlePrint(node: PrintStatement): void {

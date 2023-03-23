@@ -1,4 +1,4 @@
-import { Interpreter } from "@/interpreter/interpreter";
+import { Interpreter } from "@/interpreter";
 import { describe, beforeEach, expect, it } from "vitest";
 
 describe("interpreter -> expressions", () => {
