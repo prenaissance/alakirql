@@ -26,32 +26,32 @@ type UninitializedSymbol = {
   value: null;
 };
 
-type ArraySymbol = {
+export type ArraySymbol = {
   type: SymbolType.Array;
   value: InnerSymbol[];
 };
 
-type ObjectSymbol = {
+export type ObjectSymbol = {
   type: SymbolType.Object;
   value: Record<string, InnerSymbol>;
 };
 
-type StringSymbol = {
+export type StringSymbol = {
   type: SymbolType.String;
   value: string;
 };
 
-type NumberSymbol = {
+export type NumberSymbol = {
   type: SymbolType.Number;
   value: number;
 };
 
-type BooleanSymbol = {
+export type BooleanSymbol = {
   type: SymbolType.Boolean;
   value: boolean;
 };
 
-type DateSymbol = {
+export type DateSymbol = {
   type: SymbolType.Date;
   value: Date;
 };

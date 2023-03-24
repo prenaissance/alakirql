@@ -47,7 +47,7 @@ export interface Program extends Stmt {
 export type Expression =
   | ArrayExpression
   | BinaryExpression
-  | UnaryExpression
+  // | UnaryExpression
   | Identifier
   | Literal
   | IndexingExpression

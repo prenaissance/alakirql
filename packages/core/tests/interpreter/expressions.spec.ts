@@ -64,4 +64,56 @@ describe("interpreter -> expressions", () => {
     interpreter.interpret("declare a = [1, 2, 3]; print a[1];");
     expect(interpreter.io.outputs).toEqual(["2"]);
   });
+
+  describe("binary expressions", () => {
+    it("should handle addition", () => {
+      interpreter.interpret("print 12 + 13;");
+      expect(interpreter.io.outputs).toEqual(["25"]);
+    });
+
+    it("should handle subtraction", () => {
+      interpreter.interpret("print 12 - 13;");
+      expect(interpreter.io.outputs).toEqual(["-1"]);
+    });
+
+    it("should handle multiplication", () => {
+      interpreter.interpret("print 12 * 13;");
+      expect(interpreter.io.outputs).toEqual(["156"]);
+    });
+
+    it("should handle division", () => {
+      interpreter.interpret("print 12 / 13;");
+      expect(interpreter.io.outputs).toEqual(["0.9230769230769231"]);
+    });
+
+    it("should handle modulo", () => {
+      interpreter.interpret("print 12 % 13;");
+      expect(interpreter.io.outputs).toEqual(["12"]);
+    });
+
+    it("should handle logical and", () => {
+      interpreter.interpret("print true && true;");
+      expect(interpreter.io.outputs).toEqual(["true"]);
+    });
+
+    it("should handle logical or", () => {
+      interpreter.interpret("const a = true; print a || false;");
+      expect(interpreter.io.outputs).toEqual(["true"]);
+    });
+
+    it("should handle logical equality and inequality", () => {
+      interpreter.interpret("print 12 == 13; print 12 != 13;");
+      expect(interpreter.io.outputs).toEqual(["false", "true"]);
+    });
+
+    it("should prioritize operators in the correct order", () => {
+      interpreter.interpret("print 12 + 13 * 2;");
+      expect(interpreter.io.outputs).toEqual(["38"]);
+    });
+
+    it("should prioritize logical operators in the correct order", () => {
+      interpreter.interpret("print 12 + 13 * 2 == 38 && 12 + 13 * 2 != 39;");
+      expect(interpreter.io.outputs).toEqual(["true"]);
+    });
+  });
 });

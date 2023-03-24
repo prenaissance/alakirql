@@ -1,6 +1,7 @@
 import {
   ArrayExpression,
   AssignmentExpression,
+  BinaryExpression,
   Expression,
   ExpressionStatement,
   Identifier,
@@ -40,6 +41,7 @@ export class Interpreter {
     [NodeType.ObjectExpression]: this.handleObjectExpression,
     [NodeType.MemberExpression]: this.handleMemberExpression,
     [NodeType.IndexingExpression]: this.handleIndexingExpression,
+    [NodeType.BinaryExpression]: this.handleBinaryExpression,
   };
   interpret(program: string) {
     const ast = parse(program);
@@ -91,7 +93,11 @@ export class Interpreter {
       }
     };
 
-    this.io.print(value.value ? JSON.stringify(formatSymbol(value)) : "null");
+    this.io.print(
+      value.value !== null && value.value !== undefined
+        ? JSON.stringify(formatSymbol(value))
+        : "null",
+    );
   }
 
   handleLiteral(node: Literal): InnerSymbol {
@@ -194,5 +200,217 @@ export class Interpreter {
       throw new Error(`Index ${indexSymbol.value} is out of bounds`);
     }
     return value;
+  }
+
+  handleBinaryExpression(node: BinaryExpression) {
+    const { left, right, operator } = node;
+    const leftSymbol = this.handleExpression(left);
+    const rightSymbol = this.handleExpression(right);
+    switch (operator) {
+      case TokenType.Plus:
+        if (
+          leftSymbol.type === SymbolType.String &&
+          rightSymbol.type === SymbolType.String
+        ) {
+          return {
+            type: SymbolType.String,
+            value: leftSymbol.value + rightSymbol.value,
+          };
+        }
+        if (
+          leftSymbol.type === SymbolType.Number &&
+          rightSymbol.type === SymbolType.Number
+        ) {
+          return {
+            type: SymbolType.Number,
+            value: leftSymbol.value + rightSymbol.value,
+          };
+        }
+        if (
+          leftSymbol.type === SymbolType.Date &&
+          rightSymbol.type === SymbolType.Date
+        ) {
+          return {
+            type: SymbolType.Date,
+            value: new Date(
+              leftSymbol.value.getTime() + rightSymbol.value.getTime(),
+            ),
+          };
+        }
+        throw new Error(
+          `Cannot add type ${leftSymbol.type} and type ${rightSymbol.type}`,
+        );
+      case TokenType.Minus:
+        if (
+          leftSymbol.type === SymbolType.Number &&
+          rightSymbol.type === SymbolType.Number
+        ) {
+          return {
+            type: SymbolType.Number,
+            value: leftSymbol.value - rightSymbol.value,
+          };
+        }
+        if (
+          leftSymbol.type === SymbolType.Date &&
+          rightSymbol.type === SymbolType.Date
+        ) {
+          return {
+            type: SymbolType.Number,
+            value: leftSymbol.value.getTime() - rightSymbol.value.getTime(),
+          };
+        }
+        throw new Error(
+          `Cannot subtract type ${leftSymbol.type} and type ${rightSymbol.type}`,
+        );
+      case TokenType.Multiply:
+        if (
+          leftSymbol.type === SymbolType.Number &&
+          rightSymbol.type === SymbolType.Number
+        ) {
+          return {
+            type: SymbolType.Number,
+            value: leftSymbol.value * rightSymbol.value,
+          };
+        }
+        throw new Error(
+          `Cannot multiply type ${leftSymbol.type} and type ${rightSymbol.type}`,
+        );
+      case TokenType.Divide:
+        if (
+          leftSymbol.type === SymbolType.Number &&
+          rightSymbol.type === SymbolType.Number
+        ) {
+          return {
+            type: SymbolType.Number,
+            value: leftSymbol.value / rightSymbol.value,
+          };
+        }
+        throw new Error(
+          `Cannot divide type ${leftSymbol.type} and type ${rightSymbol.type}`,
+        );
+      case TokenType.Modulo:
+        if (
+          leftSymbol.type === SymbolType.Number &&
+          rightSymbol.type === SymbolType.Number
+        ) {
+          return {
+            type: SymbolType.Number,
+            value: leftSymbol.value % rightSymbol.value,
+          };
+        }
+        throw new Error(
+          `Cannot modulo type ${leftSymbol.type} and type ${rightSymbol.type}`,
+        );
+      case TokenType.Equal:
+        return {
+          type: SymbolType.Boolean,
+          value: leftSymbol.value === rightSymbol.value,
+        };
+      case TokenType.NotEqual:
+        return {
+          type: SymbolType.Boolean,
+          value: leftSymbol.value !== rightSymbol.value,
+        };
+      case TokenType.GreaterThan:
+        if (
+          leftSymbol.type === SymbolType.Number &&
+          rightSymbol.type === SymbolType.Number
+        ) {
+          return {
+            type: SymbolType.Boolean,
+            value: leftSymbol.value > rightSymbol.value,
+          };
+        }
+        if (
+          leftSymbol.type === SymbolType.Date &&
+          rightSymbol.type === SymbolType.Date
+        ) {
+          return {
+            type: SymbolType.Boolean,
+            value: leftSymbol.value > rightSymbol.value,
+          };
+        }
+        throw new Error(
+          `Cannot compare type ${leftSymbol.type} and type ${rightSymbol.type}`,
+        );
+      case TokenType.GreaterThanOrEqual:
+        if (
+          leftSymbol.type === SymbolType.Number &&
+          rightSymbol.type === SymbolType.Number
+        ) {
+          return {
+            type: SymbolType.Boolean,
+            value: leftSymbol.value >= rightSymbol.value,
+          };
+        }
+        if (
+          leftSymbol.type === SymbolType.Date &&
+          rightSymbol.type === SymbolType.Date
+        ) {
+          return {
+            type: SymbolType.Boolean,
+            value: leftSymbol.value >= rightSymbol.value,
+          };
+        }
+        throw new Error(
+          `Cannot compare type ${leftSymbol.type} and type ${rightSymbol.type}`,
+        );
+      case TokenType.LessThan:
+        if (
+          leftSymbol.type === SymbolType.Number &&
+          rightSymbol.type === SymbolType.Number
+        ) {
+          return {
+            type: SymbolType.Boolean,
+            value: leftSymbol.value < rightSymbol.value,
+          };
+        }
+        if (
+          leftSymbol.type === SymbolType.Date &&
+          rightSymbol.type === SymbolType.Date
+        ) {
+          return {
+            type: SymbolType.Boolean,
+            value: leftSymbol.value < rightSymbol.value,
+          };
+        }
+        throw new Error(
+          `Cannot compare type ${leftSymbol.type} and type ${rightSymbol.type}`,
+        );
+      case TokenType.LessThanOrEqual:
+        if (
+          leftSymbol.type === SymbolType.Number &&
+          rightSymbol.type === SymbolType.Number
+        ) {
+          return {
+            type: SymbolType.Boolean,
+            value: leftSymbol.value <= rightSymbol.value,
+          };
+        }
+        if (
+          leftSymbol.type === SymbolType.Date &&
+          rightSymbol.type === SymbolType.Date
+        ) {
+          return {
+            type: SymbolType.Boolean,
+            value: leftSymbol.value <= rightSymbol.value,
+          };
+        }
+        throw new Error(
+          `Cannot compare type ${leftSymbol.type} and type ${rightSymbol.type}`,
+        );
+      case TokenType.And:
+        return {
+          type: SymbolType.Boolean,
+          value: Boolean(leftSymbol.value && rightSymbol.value),
+        };
+      case TokenType.Or:
+        return {
+          type: SymbolType.Boolean,
+          value: Boolean(leftSymbol.value || rightSymbol.value),
+        };
+      default:
+        throw new Error(`Unknown operator ${operator}`);
+    }
   }
 }
