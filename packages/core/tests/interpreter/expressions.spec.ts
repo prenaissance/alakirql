@@ -39,4 +39,9 @@ describe("interpreter -> expressions", () => {
     interpreter.interpret("declare a, b; a = b = 13; print a; print b;");
     expect(interpreter.io.outputs).toEqual(["13", "13"]);
   });
+
+  it("should declare object literals", () => {
+    interpreter.interpret("declare a = { b: 12 }; print a;");
+    expect(interpreter.io.outputs).toEqual(['{"b":12}']);
+  });
 });
