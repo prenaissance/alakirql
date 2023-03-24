@@ -103,8 +103,6 @@ Install the package globally with `npm i -g @alakir/cli` or `pnpm add -g @alakir
 
 - Lexer (Add more keywords and symbols if you want)
 
-### In progress
-
 - Parser
 
   - [x] Basic keywords
@@ -114,18 +112,28 @@ Install the package globally with `npm i -g @alakir/cli` or `pnpm add -g @alakir
   - [x] Function calls
   - [x] Control flow
   - [x] Ast generation
-  - [ ] Function definitions
+  - [ ] ~~Function definitions~~ _Ignored for simplicity_
+
+### In progress
 
 - Cli (some demo scripts are in the parser 'demo' folder)
 
   - [x] Read from file
-  - [ ] Repl
+  - [x] Repl
   - [x] Lex
   - [x] Parse
-  - [ ] Interpret
+  - [x] Interpret
+  - [ ] Maintain with new features from interpreter
 
-- Interpreter / Transpiler
-  - [ ] Assignments and declarations
-  - [ ] Block scoped variables
+- Interpreter
+  - [x] Assignments and declarations
+  - [x] Block scoped variables
+  - [x] IO
   - [ ] Predefined functions
+    - [ ] lucky_number
+    - [ ] birth_chart
   - [ ] Control flow
+  - [ ] loops
+  - [ ] Array and objects
+  - [ ] Function calls
+  - [ ] Indexing & property access
