@@ -44,4 +44,24 @@ describe("interpreter -> expressions", () => {
     interpreter.interpret("declare a = { b: 12 }; print a;");
     expect(interpreter.io.outputs).toEqual(['{"b":12}']);
   });
+
+  it("should handle object property access", () => {
+    interpreter.interpret("declare a = { b: 12 }; print a.b;");
+    expect(interpreter.io.outputs).toEqual(["12"]);
+  });
+
+  it("should handle reassignment of object properties", () => {
+    interpreter.interpret("declare a = { b: 12 }; a.b = 13; print a.b;");
+    expect(interpreter.io.outputs).toEqual(["13"]);
+  });
+
+  it("should declare array literals", () => {
+    interpreter.interpret("declare a = [1, 2, 3]; print a;");
+    expect(interpreter.io.outputs).toEqual(["[1,2,3]"]);
+  });
+
+  it("should handle array indexing", () => {
+    interpreter.interpret("declare a = [1, 2, 3]; print a[1];");
+    expect(interpreter.io.outputs).toEqual(["2"]);
+  });
 });

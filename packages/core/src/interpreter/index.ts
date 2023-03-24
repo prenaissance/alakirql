@@ -85,7 +85,7 @@ export class Interpreter {
             ),
           );
         case SymbolType.Array:
-          return value.value.map((value) => formatSymbol(value).value);
+          return value.value.map((value) => formatSymbol(value));
         default:
           return value.value;
       }
@@ -176,7 +176,7 @@ export class Interpreter {
     if (value === undefined) {
       throw new Error(`Property ${property.name} is not defined`);
     }
-    return value.value;
+    return value;
   }
 
   handleIndexingExpression(node: IndexingExpression) {
@@ -193,6 +193,6 @@ export class Interpreter {
     if (value === undefined) {
       throw new Error(`Index ${indexSymbol.value} is out of bounds`);
     }
-    return value.value;
+    return value;
   }
 }
