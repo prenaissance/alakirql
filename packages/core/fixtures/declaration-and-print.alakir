@@ -1,6 +1,6 @@
-declare num = 123.34;
+declare num = 12334;
 const str = "String";
 
-num = 123.67;
+num = 12367;
 
 print num;
