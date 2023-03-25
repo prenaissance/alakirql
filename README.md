@@ -129,11 +129,13 @@ Install the package globally with `npm i -g @alakir/cli` or `pnpm add -g @alakir
   - [x] Assignments and declarations
   - [x] Block scoped variables
   - [x] IO
-  - [ ] Predefined functions
-    - [ ] lucky_number
+  - [x] Predefined functions
+    - [x] lucky
+    - [x] len _used with arrays_
     - [ ] birth_chart
-  - [ ] Control flow
-  - [ ] loops
-  - [ ] Array and objects
-  - [ ] Function calls
-  - [ ] Indexing & property access
+  - [x] Control flow
+  - [x] Loops
+  - [x] Array and objects
+  - [x] Predefined functions support
+  - [x] Function calls
+  - [x] Indexing & property access
