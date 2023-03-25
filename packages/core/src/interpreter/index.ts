@@ -2,9 +2,11 @@ import {
   ArrayExpression,
   AssignmentExpression,
   BinaryExpression,
+  BlockStatement,
   Expression,
   ExpressionStatement,
   Identifier,
+  IfStatement,
   IndexingExpression,
   Literal,
   LiteralType,
@@ -34,6 +36,8 @@ export class Interpreter {
     [NodeType.VariableDeclaration]: this.handleVariableDeclaration,
     [NodeType.AssignmentExpression]: this.handleAssignment,
     [NodeType.PrintStatement]: this.handlePrint,
+    [NodeType.IfStatement]: this.handleIfStatement,
+    [NodeType.BlockStatement]: this.handleBlockStatement,
     [NodeType.Program]: this.handleProgram,
     [NodeType.Identifier]: this.handleIdentifier,
     [NodeType.ExpressionStatement]: this.handleExpressionStatement,
@@ -98,6 +102,22 @@ export class Interpreter {
         ? JSON.stringify(formatSymbol(value))
         : "null",
     );
+  }
+
+  handleIfStatement(node: IfStatement) {
+    const { test, consequent, alternate } = node;
+    const testResult = this.handleExpression(test);
+    if (testResult.value) {
+      this.handleStatement(consequent);
+    } else if (alternate !== null) {
+      this.handleStatement(alternate);
+    }
+  }
+
+  handleBlockStatement(node: BlockStatement) {
+    this.context.pushContext();
+    node.body.forEach((statement) => this.handleStatement(statement));
+    this.context.popContext();
   }
 
   handleLiteral(node: Literal): InnerSymbol {

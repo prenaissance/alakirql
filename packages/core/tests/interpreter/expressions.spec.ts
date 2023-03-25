@@ -116,4 +116,33 @@ describe("interpreter -> expressions", () => {
       expect(interpreter.io.outputs).toEqual(["true"]);
     });
   });
+
+  describe("control flow", () => {
+    it("should handle if statements", () => {
+      interpreter.interpret("if (true) print 12;");
+      expect(interpreter.io.outputs).toEqual(["12"]);
+    });
+
+    it("should handle if-else statements", () => {
+      interpreter.interpret("if (false) print 12; else print 13;");
+      expect(interpreter.io.outputs).toEqual(["13"]);
+    });
+
+    it("should handle block statements", () => {
+      interpreter.interpret("if (true) { print 12; print 13; }");
+      expect(interpreter.io.outputs).toEqual(["12", "13"]);
+    });
+
+    it("should keep scope separate between blocks", () => {
+      const action = () =>
+        interpreter.interpret("if (true) { declare a = 12; } print a;");
+      expect(action).toThrow();
+
+      interpreter = new Interpreter();
+      interpreter.interpret(
+        "declare a = 13; if (true) { declare a = 12; print a; } print a;",
+      );
+      expect(interpreter.io.outputs).toEqual(["12", "13"]);
+    });
+  });
 });
