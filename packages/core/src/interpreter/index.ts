@@ -17,6 +17,7 @@ import {
   Program,
   Statement,
   VariableDeclaration,
+  WhileStatement,
 } from "@/parser/nodes";
 import {
   ContextStack,
@@ -46,6 +47,7 @@ export class Interpreter {
     [NodeType.MemberExpression]: this.handleMemberExpression,
     [NodeType.IndexingExpression]: this.handleIndexingExpression,
     [NodeType.BinaryExpression]: this.handleBinaryExpression,
+    [NodeType.WhileStatement]: this.handleWhileStatement,
   };
   interpret(program: string) {
     const ast = parse(program);
@@ -118,6 +120,13 @@ export class Interpreter {
     this.context.pushContext();
     node.body.forEach((statement) => this.handleStatement(statement));
     this.context.popContext();
+  }
+
+  handleWhileStatement(node: WhileStatement) {
+    const { test, body } = node;
+    while (this.handleExpression(test).value) {
+      this.handleStatement(body);
+    }
   }
 
   handleLiteral(node: Literal): InnerSymbol {
