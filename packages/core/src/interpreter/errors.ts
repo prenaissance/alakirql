@@ -1,4 +1,4 @@
-import { SymbolModifier, SymbolValue } from "./symbol-table";
+import { SymbolModifier, SymbolValue } from "./symbol-types";
 
 export class ImmutableError extends Error {
   constructor(symbol: SymbolValue) {

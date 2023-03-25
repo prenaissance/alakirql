@@ -3,6 +3,7 @@ import {
   AssignmentExpression,
   BinaryExpression,
   BlockStatement,
+  CallExpression,
   Expression,
   ExpressionStatement,
   Identifier,
@@ -19,15 +20,11 @@ import {
   VariableDeclaration,
   WhileStatement,
 } from "@/parser/nodes";
-import {
-  ContextStack,
-  InnerSymbol,
-  SymbolModifier,
-  SymbolType,
-} from "./symbol-table";
+import { ContextStack } from "./symbol-table";
 import { TokenType } from "@/lexer/tokens";
 import { IO } from "./io";
 import parse from "../parser";
+import { InnerSymbol, SymbolModifier, SymbolType } from "./symbol-types";
 
 export class Interpreter {
   private readonly context = new ContextStack();
@@ -48,6 +45,7 @@ export class Interpreter {
     [NodeType.IndexingExpression]: this.handleIndexingExpression,
     [NodeType.BinaryExpression]: this.handleBinaryExpression,
     [NodeType.WhileStatement]: this.handleWhileStatement,
+    [NodeType.CallExpression]: this.handleCallExpression,
   };
   interpret(program: string) {
     const ast = parse(program);
@@ -165,6 +163,29 @@ export class Interpreter {
       throw new Error(`Symbol ${node.name} is not declared`);
     }
     return value;
+  }
+
+  handleCallExpression(node: CallExpression) {
+    const { callee, arguments: args } = node;
+    const func = this.handleExpression(callee);
+    if (func.type !== SymbolType.Function) {
+      throw new Error("Cannot call non-function");
+    }
+    const values = args.map((arg) => this.handleExpression(arg));
+    if (func.value.args.length !== values.length) {
+      throw new Error(
+        `Expected ${func.value.args.length} arguments, got ${values.length}`,
+      );
+    }
+    func.value.args.forEach((argType, index) => {
+      if (argType !== values[index].type) {
+        throw new Error(
+          `Argument ${index} of type ${argType} expected, got ${values[index].type}`,
+        );
+      }
+    });
+
+    return func.value.body(...values);
   }
 
   handleVariableDeclaration(node: VariableDeclaration) {

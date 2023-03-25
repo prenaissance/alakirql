@@ -3,84 +3,32 @@ import {
   ImmutableError,
   NotDeclaredError,
 } from "./errors";
-
-export enum SymbolModifier {
-  Immutable = "Immutable",
-  Mutable = "Mutable",
-  Predefined = "Predefined",
-}
-
-export enum SymbolType {
-  Number = "Number",
-  String = "String",
-  Boolean = "Boolean",
-  Date = "Date",
-  Function = "Function",
-  Array = "Array",
-  Object = "Object",
-  Null = "Null",
-}
-
-type UninitializedSymbol = {
-  type: SymbolType.Null;
-  value: null;
-};
-
-export type ArraySymbol = {
-  type: SymbolType.Array;
-  value: InnerSymbol[];
-};
-
-export type ObjectSymbol = {
-  type: SymbolType.Object;
-  value: Record<string, InnerSymbol>;
-};
-
-export type StringSymbol = {
-  type: SymbolType.String;
-  value: string;
-};
-
-export type NumberSymbol = {
-  type: SymbolType.Number;
-  value: number;
-};
-
-export type BooleanSymbol = {
-  type: SymbolType.Boolean;
-  value: boolean;
-};
-
-export type DateSymbol = {
-  type: SymbolType.Date;
-  value: Date;
-};
-
-type FunctionSymbol = {
-  type: SymbolType.Function;
-  value: (args: any[]) => any;
-};
-
-export type InnerSymbol =
-  | UninitializedSymbol
-  | StringSymbol
-  | NumberSymbol
-  | BooleanSymbol
-  | DateSymbol
-  | FunctionSymbol
-  | ArraySymbol
-  | ObjectSymbol;
-
-export type SymbolValue = {
-  modifier: SymbolModifier;
-  symbol: InnerSymbol;
-};
+import { predefinedFunctions } from "./predefined-functions";
+import {
+  InnerSymbol,
+  SymbolModifier,
+  SymbolType,
+  SymbolValue,
+} from "./symbol-types";
 
 type SymbolTable = Map<string, SymbolValue>;
 
 export class ContextStack {
   private readonly globalContext: SymbolTable = new Map();
   private readonly stack: SymbolTable[] = [];
+
+  constructor() {
+    Object.entries(predefinedFunctions).forEach(([name, value]) => {
+      this.declareSymbol(
+        name,
+        {
+          type: SymbolType.Function,
+          value,
+        },
+        SymbolModifier.Predefined,
+      );
+    });
+  }
 
   getSymbol(name: string): InnerSymbol | null {
     const stack = this.stack.find((ctx) => ctx.has(name)) ?? this.globalContext;

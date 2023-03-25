@@ -152,10 +152,9 @@ describe("interpreter -> expressions", () => {
       expect(interpreter.io.outputs).toEqual(["0", "1", "2"]);
     });
 
-    // first add a way to access array length
-    it.todo("should loop through an array", () => {
+    it("should loop through an array", () => {
       interpreter.interpret(
-        "declare a = [1, 2, 3]; declare i = 0; while (i < a.length) { print a[i]; i = i + 1; }",
+        "declare a = [1, 2, 3]; declare i = 0; while (i < len(a)) { print a[i]; i = i + 1; }",
       );
       expect(interpreter.io.outputs).toEqual(["1", "2", "3"]);
     });

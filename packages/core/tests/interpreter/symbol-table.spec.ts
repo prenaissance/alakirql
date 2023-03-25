@@ -3,11 +3,12 @@ import {
   ImmutableError,
   NotDeclaredError,
 } from "@/interpreter/errors";
+import { ContextStack } from "@/interpreter/symbol-table";
 import {
-  ContextStack,
+  StringSymbol,
   SymbolModifier,
   SymbolType,
-} from "@/interpreter/symbol-table";
+} from "@/interpreter/symbol-types";
 import { beforeEach, describe, expect, it } from "vitest";
 
 const getInitialContextStack = () => {
@@ -34,7 +35,10 @@ const getInitialContextStack = () => {
     "predefinedFunction",
     {
       type: SymbolType.Function,
-      value: () => null,
+      value: {
+        args: [SymbolType.String],
+        body: (str: StringSymbol) => str,
+      },
     },
     SymbolModifier.Predefined,
   );
@@ -127,8 +131,8 @@ describe("interpreter -> symbol table / context stack", () => {
     contextStack.popContext();
     const action = () =>
       contextStack.setMutableSymbol("predefinedFunction", {
-        type: SymbolType.Function,
-        value: () => null,
+        type: SymbolType.Number,
+        value: 2,
       });
 
     expect(action).toThrowError(ImmutableError);
