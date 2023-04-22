@@ -2,7 +2,7 @@
 
 While there are unit tests written, if you want to see the lexer or parser in action, you can run some scripts from the `demo` folder with fixtures. Example:
 
-> Note: Now the cli can be used for that
+> Note: Now the cli can be used for that [@alakir/cli](https://www.npmjs.com/package/@alakir/cli)
 
 ```bash
 node dist/demo/lexer.js ./fixtures/control-flow.alakir
