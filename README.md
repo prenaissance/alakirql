@@ -24,7 +24,7 @@ This is a monorepo managed by [Turborepo](https://turbo.build/repo), having the 
 
 - @alakir/core
 - @alakir/cli
-- _probably other tools to come_
+- ~~_probably other tools to come_~~ (bullshit topic is not motivating)
 
 ## Installing the cli
 
@@ -130,9 +130,14 @@ Install the package globally with `npm i -g @alakir/cli` or `pnpm add -g @alakir
   - [x] Block scoped variables
   - [x] IO
   - [x] Predefined functions
-    - [x] lucky
-    - [x] len _used with arrays_
-    - [ ] birth_chart
+    - [x] lucky(`string`) _gets someone's name's lucky number_
+    - [x] len(`array`) _used with arrays_
+    - [x] now() _returns current date_
+    - [x] getMoonPhase(`date`)
+    - [x] getZodiacSign(`date`)
+    - [x] getZodiacEmoji(`string`)
+    - [x] areZodiacSignsCompatible(`string`, `string`)
+    - [ ] birthChart(?)
   - [x] Control flow
   - [x] Loops
   - [x] Array and objects

@@ -1,0 +1,21 @@
+const person1 = {
+    name: "Chad",
+    birth: D2002-02-01
+};
+
+const person2 = {
+    name: "Veronica",
+    birth: D2006-05-24
+};
+
+const sign1 = getZodiacSign(person1.birth);
+const sign2 = getZodiacSign(person2.birth);
+
+print person1.name + " " + getZodiacEmoji(sign1);
+print person2.name + " " + getZodiacEmoji(sign2);
+
+if (areZodiacSignsCompatible(sign1, sign2)) {
+    print "They are compatible!";
+} else {
+    print "They are not compatible!";
+}

@@ -1,5 +1,12 @@
 import {
+  areZodiacSignsCompatible,
+  getMoonPhase,
+  getZodiacEmoji,
+  getZodiacSign,
+} from "./astrology-lib";
+import {
   ArraySymbol,
+  DateSymbol,
   NumberSymbol,
   PredefinedFunction,
   StringSymbol,
@@ -24,11 +31,50 @@ export const predefinedFunctions: Record<string, PredefinedFunction> = {
 
   len: {
     args: [SymbolType.Array],
-    body: (arr: ArraySymbol) => {
-      return {
+    body: (arr: ArraySymbol) =>
+      ({
         type: SymbolType.Number,
         value: arr.value.length,
-      } as NumberSymbol;
-    },
+      } as NumberSymbol),
+  },
+
+  now: {
+    args: [],
+    body: () => ({
+      type: SymbolType.Date,
+      value: new Date(),
+    }),
+  },
+
+  getZodiacSign: {
+    args: [SymbolType.Date],
+    body: (date: DateSymbol) => ({
+      type: SymbolType.String,
+      value: getZodiacSign(date.value),
+    }),
+  },
+
+  getZodiacEmoji: {
+    args: [SymbolType.String],
+    body: (str: StringSymbol) => ({
+      type: SymbolType.String,
+      value: getZodiacEmoji(str.value),
+    }),
+  },
+
+  areZodiacSignsCompatible: {
+    args: [SymbolType.String, SymbolType.String],
+    body: (str1: StringSymbol, str2: StringSymbol) => ({
+      type: SymbolType.Boolean,
+      value: areZodiacSignsCompatible(str1.value, str2.value),
+    }),
+  },
+
+  getMoonPhase: {
+    args: [SymbolType.Date],
+    body: (date: DateSymbol) => ({
+      type: SymbolType.String,
+      value: getMoonPhase(date.value),
+    }),
   },
 };
