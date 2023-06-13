@@ -1,0 +1,9 @@
+const me = {
+    name: "Alakir",
+    birth: now()
+};
+
+const luckyNumber = lucky(me.name);
+const luckyColor = ZODIAC_COLORS[getZodiacSign(me.birth)];
+
+print "My lucky number is " + str(luckyNumber) + " and my lucky color is " + luckyColor;

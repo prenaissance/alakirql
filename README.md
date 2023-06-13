@@ -134,6 +134,7 @@ Install the package globally with `npm i -g @alakir/cli` or `pnpm add -g @alakir
   - [x] Predefined functions
     - [x] lucky(`string`) _gets someone's name's lucky number_
     - [x] len(`array`) _used with arrays_
+    - [x] str(`number`) _converts number to string_
     - [x] now() _returns current date_
     - [x] getMoonPhase(`date`)
     - [x] getZodiacSign(`date`)

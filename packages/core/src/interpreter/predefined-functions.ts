@@ -38,6 +38,15 @@ export const predefinedFunctions: Record<string, PredefinedFunction> = {
       } as NumberSymbol),
   },
 
+  str: {
+    args: [SymbolType.Number],
+    body: (num: NumberSymbol) =>
+      ({
+        type: SymbolType.String,
+        value: num.value.toString(),
+      } as StringSymbol),
+  },
+
   now: {
     args: [],
     body: () => ({

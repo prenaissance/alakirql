@@ -52,6 +52,15 @@ export class Interpreter {
     if (ast.isError) {
       throw new Error(ast.error);
     }
+    if (ast.index !== ast.tokens.length) {
+      throw new Error(
+        `Could not parse the entire program. Stopped at token ${
+          ast.index + 1
+        } of type ${ast.tokens[ast.index].type}, value : ${
+          (ast.tokens[ast.index] as any).value ?? "None"
+        }`,
+      );
+    }
 
     this.handleProgram(ast.result);
   }

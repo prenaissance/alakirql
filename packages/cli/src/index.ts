@@ -64,7 +64,7 @@ program
           try {
             interpreter.interpret(cmd);
           } catch (e) {
-            callback(e as Error, "");
+            console.log(chalk.red((e as Error).message));
           } finally {
             unsubscribe();
           }
