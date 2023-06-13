@@ -1,0 +1,15 @@
+declare a = 1;
+declare b = 1;
+declare i = 0;
+
+print a;
+print b;
+
+while(i < 10) {
+    i = i + 1;
+    const newB = a + b;
+    a = b;
+    b = newB;
+
+    print b;
+}
