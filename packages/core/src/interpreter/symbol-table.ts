@@ -3,6 +3,7 @@ import {
   ImmutableError,
   NotDeclaredError,
 } from "./errors";
+import { globalConstants } from "./global-constants";
 import { predefinedFunctions } from "./predefined-functions";
 import {
   InnerSymbol,
@@ -27,6 +28,9 @@ export class ContextStack {
         },
         SymbolModifier.Predefined,
       );
+    });
+    Object.entries(globalConstants).forEach(([name, value]) => {
+      this.declareSymbol(name, value, SymbolModifier.Predefined);
     });
   }
 

@@ -239,17 +239,29 @@ export class Interpreter {
     const { object, index } = node;
     const objectSymbol = this.handleExpression(object);
     const indexSymbol = this.handleExpression(index);
-    if (objectSymbol.type !== SymbolType.Array) {
-      throw new Error("Array expected as left operand");
+    if (objectSymbol.type === SymbolType.Array) {
+      if (indexSymbol.type !== SymbolType.Number) {
+        throw new Error("Number expected as right operand");
+      }
+      const value = objectSymbol.value[indexSymbol.value];
+      if (value === undefined) {
+        throw new Error(`Index ${indexSymbol.value} is out of bounds`);
+      }
+      return value;
     }
-    if (indexSymbol.type !== SymbolType.Number) {
-      throw new Error("Number expected as right operand");
+    if (objectSymbol.type === SymbolType.Object) {
+      if (indexSymbol.type !== SymbolType.String) {
+        throw new Error("String expected as right operand");
+      }
+      const value = objectSymbol.value[indexSymbol.value];
+      if (value === undefined) {
+        throw new Error(`Property ${indexSymbol.value} is not defined`);
+      }
+      return value;
     }
-    const value = objectSymbol.value[indexSymbol.value];
-    if (value === undefined) {
-      throw new Error(`Index ${indexSymbol.value} is out of bounds`);
-    }
-    return value;
+    throw new Error(
+      "Array or Object expected as left operand of indexing expression",
+    );
   }
 
   handleBinaryExpression(node: BinaryExpression) {

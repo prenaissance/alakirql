@@ -129,6 +129,8 @@ Install the package globally with `npm i -g @alakir/cli` or `pnpm add -g @alakir
   - [x] Assignments and declarations
   - [x] Block scoped variables
   - [x] IO
+  - [x] Function calls
+  - [x] Predefined functions support
   - [x] Predefined functions
     - [x] lucky(`string`) _gets someone's name's lucky number_
     - [x] len(`array`) _used with arrays_
@@ -138,9 +140,10 @@ Install the package globally with `npm i -g @alakir/cli` or `pnpm add -g @alakir
     - [x] getZodiacEmoji(`string`)
     - [x] areZodiacSignsCompatible(`string`, `string`)
     - [ ] birthChart(?)
+  - [x] Global constants
+    - [x] PI `number`
+    - [x] ZODIAC_COLORS `object`
   - [x] Control flow
   - [x] Loops
   - [x] Array and objects
-  - [x] Predefined functions support
-  - [x] Function calls
   - [x] Indexing & property access
