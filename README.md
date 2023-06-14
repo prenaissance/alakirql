@@ -110,11 +110,10 @@ Install the package globally with `npm i -g @alakir/cli` or `pnpm add -g @alakir
   - [x] Binary expressions
   - [x] Expressions
   - [x] Function calls
+  - [x] Array/Object element accessing
   - [x] Control flow
   - [x] Ast generation
   - [ ] ~~Function definitions~~ _Ignored for simplicity_
-
-### In progress
 
 - Cli (some demo scripts are in the parser 'demo' folder)
 
@@ -123,7 +122,7 @@ Install the package globally with `npm i -g @alakir/cli` or `pnpm add -g @alakir
   - [x] Lex
   - [x] Parse
   - [x] Interpret
-  - [ ] Maintain with new features from interpreter
+  - [x] Error handling for incomplete parsing
 
 - Interpreter
   - [x] Assignments and declarations
@@ -140,7 +139,6 @@ Install the package globally with `npm i -g @alakir/cli` or `pnpm add -g @alakir
     - [x] getZodiacSign(`date`)
     - [x] getZodiacEmoji(`string`)
     - [x] areZodiacSignsCompatible(`string`, `string`)
-    - [ ] birthChart(?)
   - [x] Global constants
     - [x] PI `number`
     - [x] ZODIAC_COLORS `object`
